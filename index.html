@@ -2097,6 +2097,7 @@ function resetPass(code){
   doors[code+'_s']=0;
   saveDoors(doors);
   if(currentPanelDistrikt&&currentPanelDistrikt.code===code)renderDoors(currentPanelDistrikt);
+  renderDashboard();
   showToast('Pass sparat! Räknare nollställda.');
 }
 
@@ -2106,6 +2107,7 @@ function addDoors(code,type,n){
   doors[key]=Math.max(0,(doors[key]||0)+n);
   saveDoors(doors);
   if(currentPanelDistrikt&&currentPanelDistrikt.code===code)renderDoors(currentPanelDistrikt);
+  renderDashboard();
 }
 
 function getTrend(d){
@@ -2225,7 +2227,7 @@ function latlngToSVG(lat,lng){
 }
 
 // LIVE GPS TRACKING
-var gpsWatchId=null, gpsDotGroup=null, gpsLastDistrikt=null;
+var gpsWatchId=null, gpsDotGroup=null, gpsLastDistrikt=null, gpsTracking=false;
 
 function createGpsDot(){
   if(gpsDotGroup)return;
@@ -2238,6 +2240,15 @@ function createGpsDot(){
   dot.setAttribute('r','6');dot.setAttribute('class','gps-dot-inner');
   gpsDotGroup.appendChild(pulse);gpsDotGroup.appendChild(dot);
   mapSVG.appendChild(gpsDotGroup);
+}
+
+function stopGps(){
+  gpsTracking=false;
+  if(gpsWatchId!==null){navigator.geolocation.clearWatch(gpsWatchId);gpsWatchId=null}
+  const btn=document.getElementById('gpsBtn');
+  btn.classList.remove('gps-active');btn.textContent='📍';
+  if(gpsDotGroup)gpsDotGroup.style.display='none';
+  gpsLastDistrikt=null;
 }
 
 function updateGpsPosition(lat,lng){
@@ -2274,35 +2285,35 @@ function findMyDistrikt(){
   if(!navigator.geolocation){alert('GPS stöds inte i denna webbläsare');return}
   
   // Toggle: if already tracking, stop
-  if(gpsWatchId!==null){
-    navigator.geolocation.clearWatch(gpsWatchId);
-    gpsWatchId=null;
-    btn.classList.remove('gps-active');btn.textContent='📍';
-    if(gpsDotGroup)gpsDotGroup.style.display='none';
-    gpsLastDistrikt=null;
+  if(gpsTracking){
+    stopGps();
     return;
   }
   
   // Start live tracking
+  gpsTracking=true;
   btn.classList.add('gps-active');btn.textContent='📍';
   
   // First: get position immediately and zoom
   navigator.geolocation.getCurrentPosition(pos=>{
+    if(!gpsTracking)return; // user already cancelled
     const lat=pos.coords.latitude,lng=pos.coords.longitude;
     if(lat<59.35||lat>59.50||lng<17.70||lng>17.95){
       alert('Du verkar inte vara i Järfälla kommun');
-      btn.classList.remove('gps-active');btn.textContent='📍';return;
+      stopGps();return;
     }
     const{found}=updateGpsPosition(lat,lng);
     if(found){zoomToDistrikt(found);setTimeout(()=>openPanel(found),250)}
     // Start continuous tracking only after first success
+    if(!gpsTracking)return;
     gpsWatchId=navigator.geolocation.watchPosition(pos=>{
+      if(!gpsTracking)return;
       const lat=pos.coords.latitude,lng=pos.coords.longitude;
       if(lat<59.35||lat>59.50||lng<17.70||lng>17.95)return;
       updateGpsPosition(lat,lng);
     },()=>{},{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
   },err=>{
-    btn.classList.remove('gps-active');btn.textContent='📍';
+    stopGps();
     if(err.code===1)alert('Ge appen tillgång till din plats i inställningarna');
     else alert('Kunde inte hämta position');
   },{enableHighAccuracy:true,timeout:10000});
@@ -2509,11 +2520,11 @@ const RD_2022={"01230201":{M:12.5,S:38.2,L:4.3,C:5.1,V:10.1,MP:4.7,KD:3.3,SD:19.
       firebase.initializeApp({apiKey:"AIzaSyBtyMSpIRaYBQAf7o21Zxxogi1fFRE_B9c",authDomain:"valkarta-a9010.firebaseapp.com",databaseURL:"https://valkarta-a9010-default-rtdb.europe-west1.firebasedatabase.app",projectId:"valkarta-a9010",storageBucket:"valkarta-a9010.firebasestorage.app",messagingSenderId:"762716226521",appId:"1:762716226521:web:c9c6f47c497dc8bebc4fc8"});
       fbDB=firebase.database();
       console.log('Firebase connected');
-      fbListen('statuses',v=>{_statuses=v||{};try{localStorage.setItem(STATUS_KEY,JSON.stringify(_statuses))}catch(e){};renderDashboard();updateProgressStat()});
-      fbListen('checks',v=>{_checks=v||{};try{localStorage.setItem(CHECK_KEY,JSON.stringify(_checks))}catch(e){};if(currentPanelDistrikt)renderChecklist(currentPanelDistrikt);renderFieldView()});
-      fbListen('contacts',v=>{_contacts=v||{};try{localStorage.setItem(CONTACT_KEY,JSON.stringify(_contacts))}catch(e){};if(currentPanelDistrikt)renderContact(currentPanelDistrikt)});
-      fbListen('notes',v=>{_notes=v||{};try{localStorage.setItem(NOTES_KEY,JSON.stringify(_notes))}catch(e){}});
-      fbListen('doors',v=>{_doors=v||{};try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};if(currentPanelDistrikt)renderDoors(currentPanelDistrikt)});
+      fbListen('statuses',v=>{if(v&&Object.keys(v).length>0){_statuses=v;try{localStorage.setItem(STATUS_KEY,JSON.stringify(_statuses))}catch(e){};renderDashboard();updateProgressStat()}});
+      fbListen('checks',v=>{if(v&&Object.keys(v).length>0){_checks=v;try{localStorage.setItem(CHECK_KEY,JSON.stringify(_checks))}catch(e){};if(currentPanelDistrikt)renderChecklist(currentPanelDistrikt);renderFieldView()}});
+      fbListen('contacts',v=>{if(v&&Object.keys(v).length>0){_contacts=v;try{localStorage.setItem(CONTACT_KEY,JSON.stringify(_contacts))}catch(e){};if(currentPanelDistrikt)renderContact(currentPanelDistrikt)}});
+      fbListen('notes',v=>{if(v&&Object.keys(v).length>0){_notes=v;try{localStorage.setItem(NOTES_KEY,JSON.stringify(_notes))}catch(e){}}});
+      fbListen('doors',v=>{if(v&&Object.keys(v).length>0){_doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard()}});
       fbListen('calendar',v=>{if(v){try{localStorage.setItem(CAL_KEY,JSON.stringify(v))}catch(e){};renderCalendar()}});
     }catch(e){console.warn('Firebase init failed',e)}
   }
