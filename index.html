@@ -428,6 +428,81 @@ function toggleTheme(){
   document.getElementById('themeBtn').textContent=isLight?'☀️':'🌙';
   try{localStorage.setItem('jarfalla_theme',isLight?'light':'dark')}catch(e){}
 }
+
+// ADDRESS SEARCH via Nominatim (OpenStreetMap)
+var addrSearchTimer=null;
+function openAddressSearch(){
+  const ex=document.getElementById('addrModal');if(ex)ex.remove();
+  const modal=document.createElement('div');
+  modal.id='addrModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:80px 20px 20px';
+  modal.innerHTML='<div style="background:var(--card);border:1px solid var(--card-border);border-radius:14px;padding:20px;max-width:380px;width:100%">'
+    +'<div style="font-size:14px;font-weight:800;margin-bottom:4px;color:var(--text)">🏠 Sök adress</div>'
+    +'<div style="font-size:11px;color:var(--text-dim);margin-bottom:14px">Skriv adress i Järfälla för att hitta distriktet</div>'
+    +'<input id="addrInput" type="text" autocomplete="off" autocapitalize="words" placeholder="t.ex. Orgonavägen 15" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--card-border);background:var(--surface);color:var(--text);font-size:16px;margin-bottom:8px;-webkit-user-select:text;user-select:text">'
+    +'<div id="addrResults" style="max-height:200px;overflow-y:auto;margin-bottom:10px;display:none;background:var(--surface);border-radius:8px;border:1px solid var(--card-border)"></div>'
+    +'<div id="addrStatus" style="font-size:11px;color:var(--text-dim);min-height:14px;margin-bottom:10px"></div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button onclick="document.getElementById(\'addrModal\').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--card-border);background:var(--surface);color:var(--text-dim);font-size:13px;font-weight:700;cursor:pointer">Stäng</button>'
+    +'</div></div>';
+  document.body.appendChild(modal);
+  setTimeout(()=>{
+    const inp=document.getElementById('addrInput');
+    inp.focus();
+    inp.addEventListener('input',e=>{
+      clearTimeout(addrSearchTimer);
+      const q=(e.target.value||'').trim();
+      if(q.length<3){document.getElementById('addrResults').style.display='none';document.getElementById('addrStatus').textContent='';return}
+      addrSearchTimer=setTimeout(()=>runAddressSearch(q),400);
+    });
+  },100);
+}
+
+function runAddressSearch(q){
+  const status=document.getElementById('addrStatus');
+  const results=document.getElementById('addrResults');
+  status.textContent='Söker...';status.style.color='var(--text-dim)';
+  results.style.display='none';
+  const query=q.toLowerCase().includes('järfälla')?q:q+', Järfälla';
+  // viewbox bounds Järfälla: left,top,right,bottom
+  const url='https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=se&addressdetails=1&viewbox=17.70,59.50,17.95,59.35&bounded=1&q='+encodeURIComponent(query);
+  fetch(url)
+    .then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+    .then(data=>{
+      if(!data||data.length===0){
+        status.textContent='Inga träffar. Försök med gatunamn + nummer.';
+        status.style.color='var(--yellow)';return;
+      }
+      status.textContent='Välj adress:';status.style.color='var(--text-dim)';
+      results.innerHTML=data.map((r,i)=>{
+        const name=r.display_name.split(',').slice(0,3).join(',');
+        return '<div onclick="pickAddress('+r.lat+','+r.lon+',\''+name.replace(/'/g,"\\'")+'\')" style="padding:10px;border-bottom:1px solid var(--card-border);cursor:pointer;font-size:12px;color:var(--text)" onmouseover="this.style.background=\'var(--surface2)\'" onmouseout="this.style.background=\'transparent\'"><b>'+name.split(',')[0]+'</b><div style="font-size:10px;color:var(--text-dim);margin-top:2px">'+name+'</div></div>';
+      }).join('');
+      results.style.display='block';
+    })
+    .catch(err=>{
+      status.textContent='Kunde inte söka (kontrollera internet). Fel: '+err.message;
+      status.style.color='var(--red)';
+    });
+}
+
+function pickAddress(lat,lng,name){
+  lat=parseFloat(lat);lng=parseFloat(lng);
+  if(lat<59.35||lat>59.50||lng<17.70||lng>17.95){
+    document.getElementById('addrStatus').textContent='Adressen är utanför Järfälla';
+    document.getElementById('addrStatus').style.color='var(--red)';return;
+  }
+  const {found}=updateGpsPosition(lat,lng);
+  if(found){
+    document.getElementById('addrModal').remove();
+    zoomToDistrikt(found);
+    setTimeout(()=>openPanel(found),250);
+    showToast('Hittat: '+found.namn);
+  } else {
+    document.getElementById('addrStatus').textContent='Adressen är i Järfälla men utanför de 42 distrikten';
+    document.getElementById('addrStatus').style.color='var(--yellow)';
+  }
+}
 </script>
 </head>
 <body>
@@ -449,6 +524,7 @@ function toggleTheme(){
     <input type="text" id="searchInput" placeholder="Sök distrikt eller postnummer..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
     <button id="gpsBtn" onclick="findMyDistrikt()" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--card-border);color:var(--text-dim);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="Hitta mitt distrikt">📍</button>
+    <button id="addrBtn" onclick="openAddressSearch()" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--card-border);color:var(--text-dim);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="Sök adress">🏠</button>
     <button id="themeBtn" onclick="toggleTheme()" style="width:32px;height:32px;border-radius:50%;background:var(--surface2);border:1px solid var(--card-border);color:var(--text-dim);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="Byt tema">🌙</button>
   </div>
   <div class="search-dropdown" id="searchDropdown"></div>
@@ -2019,6 +2095,19 @@ function saveNote(code){
 // DOOR COUNTER
 // ══════════════════════════════════════════
 const DOORS_KEY='jarfalla_doors';
+// Count meaningful door data (sum of all door/samtal counters + history entries).
+// Used to stop a device with thinner data from overwriting a device with more.
+function doorWeight(d){
+  if(!d||typeof d!=='object')return 0;
+  let w=0;
+  for(const k in d){
+    if(k.startsWith('_'))continue; // skip meta like _lastBackup, _totalGoalD
+    const v=d[k];
+    if(typeof v==='number')w+=v;
+    else if(Array.isArray(v))w+=v.length*100; // history entries weigh heavily
+  }
+  return w;
+}
 function loadDoors(){return _doors}
 function saveDoors(d){
   _doors=d;try{localStorage.setItem(DOORS_KEY,JSON.stringify(d))}catch(e){};fbSet('doors',d);
@@ -2713,7 +2802,16 @@ const RD_2022={"01230201":{M:12.5,S:38.2,L:4.3,C:5.1,V:10.1,MP:4.7,KD:3.3,SD:19.
       fbListen('checks',v=>{if(v&&Object.keys(v).length>0){_checks=v;try{localStorage.setItem(CHECK_KEY,JSON.stringify(_checks))}catch(e){};if(currentPanelDistrikt)renderChecklist(currentPanelDistrikt);renderFieldView()}});
       fbListen('contacts',v=>{if(v&&Object.keys(v).length>0){_contacts=v;try{localStorage.setItem(CONTACT_KEY,JSON.stringify(_contacts))}catch(e){};if(currentPanelDistrikt)renderContact(currentPanelDistrikt)}});
       fbListen('notes',v=>{if(v&&Object.keys(v).length>0){_notes=v;try{localStorage.setItem(NOTES_KEY,JSON.stringify(_notes))}catch(e){}}});
-      fbListen('doors',v=>{if(v&&Object.keys(v).length>0){_doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard()}});
+      fbListen('doors',v=>{if(v&&Object.keys(v).length>0){
+        // Guard: only accept incoming data if it's not thinner than what we have locally.
+        // Stops an old/empty device or tab from wiping fresh data.
+        if(doorWeight(v)>=doorWeight(_doors)){
+          _doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard();
+        } else {
+          // Local data is richer — push it back up so the other device gets corrected.
+          fbSet('doors',_doors);
+        }
+      }});
       fbListen('calendar',v=>{if(v){try{localStorage.setItem(CAL_KEY,JSON.stringify(v))}catch(e){};renderCalendar()}});
     }catch(e){console.warn('Firebase init failed',e)}
   }
