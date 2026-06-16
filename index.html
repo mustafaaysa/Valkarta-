@@ -584,6 +584,7 @@ function pickAddress(lat,lng,name){
     <button class="map-ctrl-btn" onclick="setMapMode('vanster',this)">🔴 V-block leder</button>
     <button class="map-ctrl-btn" onclick="setMapMode('hoger',this)">🔵 H-block leder</button>
     <button class="map-ctrl-btn" onclick="setMapMode('vagmastar',this)">⚖️ Vågmästare</button>
+    <button class="map-ctrl-btn" onclick="setMapMode('magda',this)">🌹 Magdamoderater</button>
   </div>
   <div class="map-wrap" id="mapWrap">
     <svg id="mapsvg" viewBox="0 0 560 760" xmlns="http://www.w3.org/2000/svg">
@@ -915,6 +916,7 @@ const D = [{"code": "01230312", "namn": "Centrala Viksjö Norra", "path": "M 236
 // ══════════════════════════════════════════
 let fbDB=null;
 function fbSet(path,val){try{if(fbDB)fbDB.ref(path).set(val)}catch(e){}}
+function fbUpdate(path,patch){try{if(fbDB)fbDB.ref(path).update(patch)}catch(e){}}
 function fbListen(path,cb){try{if(fbDB)fbDB.ref(path).on('value',snap=>{const v=snap.val();if(v!==null)cb(v)})}catch(e){}}
 
 // Early declarations (needed before their sections)
@@ -1260,6 +1262,7 @@ function setMapMode(mode,btn){
   const areaModes={'jakobsberg':'Jakobsberg','barkarby':'Barkarby','viksjö':'Viksjö','kallhäll':'Kallhäll'};
   const isStatus=mode==='status';
   const isBloc=mode==='vanster'||mode==='hoger'||mode==='vagmastar';
+  const isMagdaMode=mode==='magda';
   const statuses=isStatus?loadStatuses():{};
 
   mapGroups.forEach(({g,d,poly})=>{
@@ -1272,6 +1275,7 @@ function setMapMode(mode,btn){
     else if(mode==='vanster')show=margin>5;
     else if(mode==='hoger')show=margin<-5;
     else if(mode==='vagmastar')show=Math.abs(margin)<=5;
+    else if(mode==='magda')show=isMagda(d);
     else if(areaModes[mode])show=getArea(d)===areaModes[mode];
 
     g.style.opacity=show?'1':'0.12';g.style.pointerEvents=show?'all':'none';
@@ -1279,6 +1283,14 @@ function setMapMode(mode,btn){
     if(isStatus){
       const st=statuses[d.code]||'ej';
       poly.setAttribute('fill',STATUS_FILL[st]||'#333');
+    } else if(isMagdaMode){
+      if(isMagda(d)){
+        const gap=Math.abs((d.partier?.S||0)-(d.partier?.M||0));
+        // Mörkare lila = jämnare kamp = störst chans att vinna över M-väljare
+        poly.setAttribute('fill',gap<=2?'#6C3483':gap<=5?'#8E44AD':'#B07CC6');
+      } else {
+        poly.setAttribute('fill','#333');
+      }
     } else if(isBloc){
       if(margin>10)poly.setAttribute('fill','#8B0000');
       else if(margin>5)poly.setAttribute('fill','#D0021B');
@@ -1290,7 +1302,16 @@ function setMapMode(mode,btn){
       poly.setAttribute('fill',d.s_color||'#888');
     }
   });
-  mapColorMode=isStatus?'status':isBloc?'bloc':'default';
+  mapColorMode=isStatus?'status':(isBloc||isMagdaMode)?'bloc':'default';
+}
+
+// "Magdamoderater" = distrikt med liberala högerväljare som kan vinnas till S.
+// Profil: M+L starka (borgerligt men liberalt), SD svagt (ej konservativ höger),
+// och S inom räckhåll för M (jämn kamp = mjuka M-väljare avgör).
+function isMagda(d){
+  const p=d.partier||{};
+  const m=p.M||0,l=p.L||0,sd=p.SD||0,s=p.S||0;
+  return (m+l)>=25 && sd<=13 && Math.abs(s-m)<=10;
 }
 
 function updateProgressStat(){
@@ -2109,13 +2130,24 @@ function doorWeight(d){
   return w;
 }
 function loadDoors(){return _doors}
-function saveDoors(d){
-  _doors=d;try{localStorage.setItem(DOORS_KEY,JSON.stringify(d))}catch(e){};fbSet('doors',d);
+// saveDoors(d) = full skrivning (endast återställning/nollställning).
+// saveDoors(d, keys) = skriver BARA de ändrade nycklarna till Firebase (per-distrikt-synk).
+// Då kan flera enheter logga olika distrikt samtidigt utan att skriva över varandra.
+function saveDoors(d,keys){
+  _doors=d;try{localStorage.setItem(DOORS_KEY,JSON.stringify(d))}catch(e){};
+  if(keys&&keys.length){
+    const patch={};
+    keys.forEach(k=>{patch[k]=(d[k]===undefined)?null:d[k]});
+    fbUpdate('doors',patch);
+  } else {
+    fbSet('doors',d);
+  }
   // Daily backup – max 1 per day
   const today=new Date().toISOString().slice(0,10);
   const lastBackup=_doors._lastBackup||'';
   if(today!==lastBackup){
     _doors._lastBackup=today;
+    fbUpdate('doors',{_lastBackup:today});
     fbSet('backups/doors_'+today,d);
     // Clean backups older than 7 days
     try{
@@ -2132,13 +2164,13 @@ function restoreDoorsBackup(dateStr){
   if(!fbDB)return;
   fbDB.ref('backups/doors_'+dateStr).once('value',snap=>{
     const v=snap.val();
-    if(v){_doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(v))}catch(e){};fbSet('doors',v);showToast('Återställt från '+dateStr);if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard()}
+    if(v){v._rev=Date.now();_doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(v))}catch(e){};fbSet('doors',v);showToast('Återställt från '+dateStr);if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard()}
     else{showToast('Ingen backup hittad för '+dateStr)}
   });
 }
 function resetAllDoors(){
   if(!confirm('Är du säker? ALL dörrknackningsdata nollställs.'))return;
-  _doors={};try{localStorage.setItem(DOORS_KEY,'{}')}catch(e){};fbSet('doors',{});
+  _doors={_rev:Date.now()};try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};fbSet('doors',_doors);
   showToast('All dörrdata nollställd');if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard();
 }
 
@@ -2263,7 +2295,7 @@ function saveGoal(code){
   const doors=loadDoors();
   doors[code+'_goalD']=nyD;
   doors[code+'_goalS']=nyS;
-  saveDoors(doors);
+  saveDoors(doors,[code+'_goalD',code+'_goalS']);
   document.getElementById('goalModal').remove();
   if(currentPanelDistrikt&&currentPanelDistrikt.code===code)renderDoors(currentPanelDistrikt);
   showToast('Mål sparat');
@@ -2298,7 +2330,7 @@ function saveTotalGoal(){
   const doors=loadDoors();
   doors._totalGoalD=nyD;
   doors._totalGoalS=nyS;
-  saveDoors(doors);
+  saveDoors(doors,['_totalGoalD','_totalGoalS']);
   document.getElementById('goalModal').remove();
   renderDashboard();
   showToast('Kampanjmål sparat');
@@ -2358,7 +2390,7 @@ function resetPass(code){
   doors[code+'_hist'].push({d:curD,s:curS,date:dateStr,namn:namn||'Okänd'});
   doors[code]=0;
   doors[code+'_s']=0;
-  saveDoors(doors);
+  saveDoors(doors,[code,code+'_s',code+'_totD',code+'_totS',code+'_pass',code+'_hist']);
   if(currentPanelDistrikt&&currentPanelDistrikt.code===code)renderDoors(currentPanelDistrikt);
   renderDashboard();
   showToast('Pass sparat! Räknare nollställda.');
@@ -2368,7 +2400,7 @@ function addDoors(code,type,n){
   const doors=loadDoors();
   const key=type==='s'?code+'_s':code;
   doors[key]=Math.max(0,(doors[key]||0)+n);
-  saveDoors(doors);
+  saveDoors(doors,[key]);
   if(currentPanelDistrikt&&currentPanelDistrikt.code===code)renderDoors(currentPanelDistrikt);
   renderDashboard();
 }
@@ -2803,12 +2835,13 @@ const RD_2022={"01230201":{M:12.5,S:38.2,L:4.3,C:5.1,V:10.1,MP:4.7,KD:3.3,SD:19.
       fbListen('contacts',v=>{if(v&&Object.keys(v).length>0){_contacts=v;try{localStorage.setItem(CONTACT_KEY,JSON.stringify(_contacts))}catch(e){};if(currentPanelDistrikt)renderContact(currentPanelDistrikt)}});
       fbListen('notes',v=>{if(v&&Object.keys(v).length>0){_notes=v;try{localStorage.setItem(NOTES_KEY,JSON.stringify(_notes))}catch(e){}}});
       fbListen('doors',v=>{if(v&&Object.keys(v).length>0){
-        // Guard: only accept incoming data if it's not thinner than what we have locally.
-        // Stops an old/empty device or tab from wiping fresh data.
-        if(doorWeight(v)>=doorWeight(_doors)){
+        // Acceptera inkommande om: (1) avsiktlig återställning/nollställning (_rev nyare),
+        // eller (2) datan är minst lika rik som lokal (viktskydd mot gamla enheter).
+        const newerRev=(v._rev||0)>(_doors._rev||0);
+        if(newerRev||doorWeight(v)>=doorWeight(_doors)){
           _doors=v;try{localStorage.setItem(DOORS_KEY,JSON.stringify(_doors))}catch(e){};if(currentPanelDistrikt)renderDoors(currentPanelDistrikt);renderDashboard();
         } else {
-          // Local data is richer — push it back up so the other device gets corrected.
+          // Lokal data är rikare — skicka tillbaka så andra enheten korrigeras.
           fbSet('doors',_doors);
         }
       }});
