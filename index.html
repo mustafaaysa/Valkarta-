@@ -558,33 +558,44 @@ function pickAddress(lat,lng,name){
 
 <!-- MAP -->
 <div class="page active" id="page0">
-  <div class="map-legend">
-    <span class="leg-lbl">S-styrka:</span>
-    <div class="leg"><div class="leg-dot" style="background:#6B0000"></div>≥40%</div>
-    <div class="leg"><div class="leg-dot" style="background:#8B0000"></div>34–40%</div>
-    <div class="leg"><div class="leg-dot" style="background:#c0001a"></div>30–34%</div>
-    <div class="leg"><div class="leg-dot" style="background:#d94040"></div>27–30%</div>
-    <div class="leg"><div class="leg-dot" style="background:#c06060"></div>23–27%</div>
-    <div class="leg"><div class="leg-dot" style="background:#2c6fad"></div>M leder</div>
-  </div>
   <div class="map-controls">
-    <button class="map-ctrl-btn active" onclick="setMapMode('all',this)">Alla</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('topp',this)">🔴 Topp</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('hog',this)">🟠 Hög</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('svag',this)">📉 S &lt;30%</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('status',this)">🗺️ Fältstatus</button>
+    <button class="map-ctrl-btn active" data-grp="mode" onclick="setMode('all',this)">Alla</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('topp',this)">🔴 Topp</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('hog',this)">🟠 Hög</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('svag',this)">📉 S &lt;30%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('status',this)">🗺️ Fältstatus</button>
+  </div>
+  <div class="map-controls" style="padding-top:0">
+    <span style="font-size:8px;font-weight:700;color:var(--text-dim);align-self:center;margin-right:2px">S-STYRKA:</span>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('s40',this)">≥40%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('s3440',this)">34–40%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('s3034',this)">30–34%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('s2730',this)">27–30%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('s2327',this)">23–27%</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('mleder',this)">🔵 M leder</button>
   </div>
   <div class="map-controls" style="padding-top:0;border-bottom:1px solid var(--card-border)">
-    <button class="map-ctrl-btn" onclick="setMapMode('jakobsberg',this)">📍 Jakobsberg</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('barkarby',this)">📍 Barkarby/Skälby</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('viksjö',this)">📍 Viksjö</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('kallhäll',this)">📍 Kallhäll</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('vanster',this)">🔴 V-block leder</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('hoger',this)">🔵 H-block leder</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('vagmastar',this)">⚖️ Vågmästare</button>
+    <button class="map-ctrl-btn" data-grp="mode" onclick="setMode('magda',this)">🌹 Magdamoderater</button>
   </div>
   <div class="map-controls" style="padding-top:0;border-bottom:1px solid var(--card-border)">
-    <button class="map-ctrl-btn" onclick="setMapMode('vanster',this)">🔴 V-block leder</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('hoger',this)">🔵 H-block leder</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('vagmastar',this)">⚖️ Vågmästare</button>
-    <button class="map-ctrl-btn" onclick="setMapMode('magda',this)">🌹 Magdamoderater</button>
+    <span style="font-size:8px;font-weight:700;color:var(--text-dim);align-self:center;margin-right:2px">SCENARIO:</span>
+    <button class="map-ctrl-btn active" data-grp="scen" onclick="setScenario('none',this)">Av (2022)</button>
+    <button class="map-ctrl-btn" data-grp="scen" onclick="setScenario('bear',this)">🐻 Bear</button>
+    <button class="map-ctrl-btn" data-grp="scen" onclick="setScenario('neutral',this)">➖ Neutral</button>
+    <button class="map-ctrl-btn" data-grp="scen" onclick="setScenario('bull',this)">🐂 Bull</button>
+  </div>
+  <div id="scenPanel" style="display:none;background:var(--card);color:var(--text);border-bottom:1px solid var(--card-border);padding:7px 12px;max-height:45vh;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+  <div class="map-controls" style="padding-top:0;border-bottom:1px solid var(--card-border)">
+    <span style="font-size:8px;font-weight:700;color:var(--text-dim);align-self:center;margin-right:2px">OMRÅDE:</span>
+    <button class="map-ctrl-btn active" data-grp="area" onclick="setArea('allomr',this)">Hela Järfälla</button>
+    <button class="map-ctrl-btn" data-grp="area" onclick="setArea('jakobsberg',this)">📍 Jakobsberg</button>
+    <button class="map-ctrl-btn" data-grp="area" onclick="setArea('barkarby',this)">📍 Barkarby/Skälby</button>
+    <button class="map-ctrl-btn" data-grp="area" onclick="setArea('viksjö',this)">📍 Viksjö</button>
+    <button class="map-ctrl-btn" data-grp="area" onclick="setArea('kallhäll',this)">📍 Kallhäll</button>
+    <button class="map-ctrl-btn" onclick="clearFilters(this)" style="background:var(--red-glow);border-color:rgba(208,2,27,.3);color:var(--red-mid)">✖️ Rensa allt</button>
   </div>
   <div class="map-wrap" id="mapWrap">
     <svg id="mapsvg" viewBox="0 0 560 760" xmlns="http://www.w3.org/2000/svg">
@@ -871,6 +882,7 @@ function pickAddress(lat,lng,name){
       <button class="year-btn" onclick="setPanelYear(2018)">KF 2018</button>
       <button class="year-btn" onclick="setPanelYear('rd')">RD 2022</button>
       <button class="year-btn" onclick="setPanelYear('compare')">Jämför</button>
+      <button class="year-btn" id="scenYearBtn" style="display:none" onclick="setPanelYear('scen')">Scenario</button>
     </div>
     <div class="panel-sec" id="pYearLabel">Partiresultat kommunval 2022</div>
     <div id="pparties"></div>
@@ -1257,9 +1269,61 @@ function getBlocMargin(d){
   return left-right;
 }
 
-function setMapMode(mode,btn){
-  document.querySelectorAll('.map-ctrl-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+// Två oberoende filter som kombineras med OCH:
+//  - currentMode: färg/urval (all, topp, hog, svag, status, block, magda)
+//  - currentArea: geografiskt område (allomr, jakobsberg, barkarby, viksjö, kallhäll)
+// Exempel: currentMode='magda' + currentArea='viksjö' = Magdamoderater i Viksjö.
+var currentMode='all';
+var currentArea='allomr';
+
+function setMode(mode,btn){
+  // Toggla: om man trycker på ett redan aktivt läge stängs det av (tillbaka till "Alla").
+  if(currentMode===mode && mode!=='all'){
+    currentMode='all';
+    document.querySelectorAll('.map-ctrl-btn[data-grp="mode"]').forEach(b=>b.classList.remove('active'));
+    const allBtn=document.querySelector('.map-ctrl-btn[data-grp="mode"]');
+    if(allBtn)allBtn.classList.add('active');
+    applyMapFilter();
+    return;
+  }
+  currentMode=mode;
+  document.querySelectorAll('.map-ctrl-btn[data-grp="mode"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyMapFilter();
+}
+function setArea(area,btn){
+  // Toggla: trycker man på ett redan aktivt område återgår man till "Hela Järfälla".
+  if(currentArea===area && area!=='allomr'){
+    currentArea='allomr';
+    document.querySelectorAll('.map-ctrl-btn[data-grp="area"]').forEach(b=>b.classList.remove('active'));
+    const allArea=document.querySelector('.map-ctrl-btn[data-grp="area"]');
+    if(allArea)allArea.classList.add('active');
+    applyMapFilter();
+    return;
+  }
+  currentArea=area;
+  document.querySelectorAll('.map-ctrl-btn[data-grp="area"]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyMapFilter();
+}
+
+// Nollställer båda filtren till utgångsläget: alla distrikt, hela Järfälla.
+function clearFilters(){
+  currentMode='all';
+  currentArea='allomr';
+  document.querySelectorAll('.map-ctrl-btn[data-grp="mode"]').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.map-ctrl-btn[data-grp="area"]').forEach(b=>b.classList.remove('active'));
+  // Markera "Alla" och "Hela Järfälla" som aktiva igen
+  const allBtn=document.querySelector('.map-ctrl-btn[data-grp="mode"]');
+  const allArea=document.querySelector('.map-ctrl-btn[data-grp="area"]');
+  if(allBtn)allBtn.classList.add('active');
+  if(allArea)allArea.classList.add('active');
+  applyMapFilter();
+}
+
+function applyMapFilter(){
   const areaModes={'jakobsberg':'Jakobsberg','barkarby':'Barkarby','viksjö':'Viksjö','kallhäll':'Kallhäll'};
+  const mode=currentMode;
   const isStatus=mode==='status';
   const isBloc=mode==='vanster'||mode==='hoger'||mode==='vagmastar';
   const isMagdaMode=mode==='magda';
@@ -1268,25 +1332,37 @@ function setMapMode(mode,btn){
   mapGroups.forEach(({g,d,poly})=>{
     const pk=getPrioKey(d.kampanj?.prio);const sVal=d.partier?.S||0;
     const margin=getBlocMargin(d);
-    let show=true;
-    if(mode==='topp')show=pk==='topp';
-    else if(mode==='hog')show=pk==='hog';
-    else if(mode==='svag')show=sVal<30;
-    else if(mode==='vanster')show=margin>5;
-    else if(mode==='hoger')show=margin<-5;
-    else if(mode==='vagmastar')show=Math.abs(margin)<=5;
-    else if(mode==='magda')show=isMagda(d);
-    else if(areaModes[mode])show=getArea(d)===areaModes[mode];
 
+    // 1. Områdesfilter
+    let inArea=true;
+    if(currentArea!=='allomr')inArea=getArea(d)===areaModes[currentArea];
+
+    // 2. Lägesfilter
+    let inMode=true;
+    if(mode==='topp')inMode=pk==='topp';
+    else if(mode==='hog')inMode=pk==='hog';
+    else if(mode==='svag')inMode=sVal<30;
+    else if(mode==='vanster')inMode=margin>5;
+    else if(mode==='hoger')inMode=margin<-5;
+    else if(mode==='vagmastar')inMode=Math.abs(margin)<=5;
+    else if(mode==='magda')inMode=isMagda(d);
+    else if(mode==='s40')inMode=d.winner==='S'&&sVal>=40;
+    else if(mode==='s3440')inMode=d.winner==='S'&&sVal>=34&&sVal<40;
+    else if(mode==='s3034')inMode=d.winner==='S'&&sVal>=30&&sVal<34;
+    else if(mode==='s2730')inMode=d.winner==='S'&&sVal>=27&&sVal<30;
+    else if(mode==='s2327')inMode=d.winner==='S'&&sVal>=23&&sVal<27;
+    else if(mode==='mleder')inMode=d.winner==='M';
+
+    const show=inArea&&inMode;
     g.style.opacity=show?'1':'0.12';g.style.pointerEvents=show?'all':'none';
 
+    // Färgläggning enligt aktivt läge
     if(isStatus){
       const st=statuses[d.code]||'ej';
       poly.setAttribute('fill',STATUS_FILL[st]||'#333');
     } else if(isMagdaMode){
       if(isMagda(d)){
         const gap=Math.abs((d.partier?.S||0)-(d.partier?.M||0));
-        // Mörkare lila = jämnare kamp = störst chans att vinna över M-väljare
         poly.setAttribute('fill',gap<=2?'#6C3483':gap<=5?'#8E44AD':'#B07CC6');
       } else {
         poly.setAttribute('fill','#333');
@@ -1298,6 +1374,10 @@ function setMapMode(mode,btn){
       else if(margin>-5)poly.setAttribute('fill','#7090c0');
       else if(margin>-10)poly.setAttribute('fill','#4070b0');
       else poly.setAttribute('fill','#2D6FB5');
+    } else if(currentScenario!=='none'){
+      // Färglägg efter S-styrka i valt scenario
+      const sv=scenParty(d,currentScenario).S||0;
+      poly.setAttribute('fill', sv>=40?'#6B0000':sv>=34?'#8B0000':sv>=30?'#c0001a':sv>=27?'#d94040':sv>=23?'#c06060':'#2c6fad');
     } else {
       poly.setAttribute('fill',d.s_color||'#888');
     }
@@ -1305,7 +1385,148 @@ function setMapMode(mode,btn){
   mapColorMode=isStatus?'status':(isBloc||isMagdaMode)?'bloc':'default';
 }
 
-// "Magdamoderater" = distrikt med liberala högerväljare som kan vinnas till S.
+// Bakåtkompatibilitet om något annat ställe kallar setMapMode
+function setMapMode(mode,btn){setMode(mode,btn);}
+
+// ============ SCENARIOMODELL ============
+// Tre utfall byggda på den faktiska svingen 2018→2022:
+// Magdamoderat-distrikten gav S +5,20 pp medan övriga Järfälla gav +2,59 pp.
+// Bull = svingen upprepas. Neutral = halva svingen. Bear = riksmotvind.
+// Befolkningen antas växa 5,7% sedan 2022 (Järfälla ~85 300 → ~90 200 invånare).
+// Valdeltagandet per distrikt hålls oförändrat.
+const POP_GROWTH=0.057;
+const SCENARIOS={
+  bear:    {namn:'Bear',   ikon:'🐻', txt:'Riksmotvind. S tappar, M och SD återhämtar sig.',
+            sMagda:-1.0, sOther:-2.5, M:+2.0, SD:+1.0, L:-1.5, V:-0.5, C:+0.5, KD:+0.5, MP:-0.1},
+  neutral: {namn:'Neutral',ikon:'➖', txt:'Halva Magda-svingen upprepas, L faller delvis.',
+            sMagda:+2.6, sOther:0.0, M:-1.0, SD:-0.5, L:-2.5, V:+0.9, C:+0.8, KD:+0.5, MP:+0.6},
+  bull:    {namn:'Bull',   ikon:'🐂', txt:'Magda-svingen upprepas fullt ut och L kollapsar.',
+            sMagda:+5.2, sOther:+1.2, M:-2.5, SD:-0.5, L:-3.0, V:+1.0, C:+1.0, KD:+0.8, MP:+0.6}
+};
+var currentScenario='none';
+
+// Räknar om ett distrikts partiprocent enligt valt scenario
+function scenParty(d,scen){
+  const s=SCENARIOS[scen]; if(!s)return d.partier;
+  const p=d.partier;
+  const magda=isMagda(d);
+  const out={};
+  for(const k in p){
+    let v=p[k]||0;
+    if(k==='S')      v+= magda?s.sMagda:s.sOther;
+    else if(s[k]!==undefined) v+=s[k];
+    out[k]=Math.max(0,v);
+  }
+  // Normalisera till 100% så inget läcker
+  const sum=Object.values(out).reduce((a,b)=>a+b,0);
+  if(sum>0)for(const k in out)out[k]=out[k]*100/sum;
+  return out;
+}
+// Röstberättigade och röster efter befolkningstillväxt, samma valdeltagande
+function scenRoster(d,scen){
+  if(scen==='none')return {rb:d.rostberatt,roster:d.totala_roster};
+  const rb=Math.round(d.rostberatt*(1+POP_GROWTH));
+  return {rb:rb,roster:Math.round(rb*(d.valdeltagande||0)/100)};
+}
+
+// Jämkade uddatalsmetoden (första divisor 1,2), 61 mandat, 2% spärr
+function fordelaMandat(rosterPerParti,mandat){
+  const tot=Object.values(rosterPerParti).reduce((a,b)=>a+b,0);
+  const kvar={};
+  for(const k in rosterPerParti){
+    if(k==='övr')continue;
+    if(rosterPerParti[k]/tot*100>=2)kvar[k]=rosterPerParti[k];
+  }
+  const res={};for(const k in kvar)res[k]=0;
+  for(let i=0;i<mandat;i++){
+    let best=null,bv=-1;
+    for(const k in kvar){
+      const div=res[k]===0?1.2:(2*res[k]+1);
+      const v=kvar[k]/div;
+      if(v>bv){bv=v;best=k}
+    }
+    if(best===null)break;
+    res[best]++;
+  }
+  return res;
+}
+
+function setScenario(scen,btn){
+  if(currentScenario===scen&&scen!=='none'){scen='none';btn=document.querySelector('.map-ctrl-btn[data-grp="scen"]')}
+  currentScenario=scen;
+  document.querySelectorAll('.map-ctrl-btn[data-grp="scen"]').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderScenPanel();
+  applyMapFilter();
+  syncScenarioPanel();
+}
+
+var scenExpanded=false;
+function toggleScenPanel(){scenExpanded=!scenExpanded;renderScenPanel()}
+
+function renderScenPanel(){
+  const el=document.getElementById('scenPanel');
+  if(!el)return;
+  if(currentScenario==='none'){el.style.display='none';return}
+  const s=SCENARIOS[currentScenario];
+  // Basläge 2022
+  let bTot=0,bS=0;const bParti={};
+  D.forEach(d=>{const r=d.totala_roster;bTot+=r;
+    for(const k in d.partier){bParti[k]=(bParti[k]||0)+r*d.partier[k]/100}});
+  bS=bParti.S/bTot*100;
+  // Scenario
+  let nTot=0,nRb=0;const nParti={};
+  D.forEach(d=>{const rr=scenRoster(d,currentScenario);const pp=scenParty(d,currentScenario);
+    nTot+=rr.roster;nRb+=rr.rb;
+    for(const k in pp){nParti[k]=(nParti[k]||0)+rr.roster*pp[k]/100}});
+  const nS=nParti.S/nTot*100;
+  const mand=fordelaMandat(nParti,61);
+  const bMand=fordelaMandat(bParti,61);
+  const L_=['S','V','MP','C'],R_=['M','KD','L','SD'];
+  const vBlock=L_.reduce((a,k)=>a+(nParti[k]||0),0)/nTot*100;
+  const hBlock=R_.reduce((a,k)=>a+(nParti[k]||0),0)/nTot*100;
+  const vMand=L_.reduce((a,k)=>a+(mand[k]||0),0),hMand=R_.reduce((a,k)=>a+(mand[k]||0),0);
+  const diff=nS-bS;
+  const col=diff>=0?'#4ade80':'#f87171';
+
+  // Kompakt rad – alltid synlig
+  const head=`<div onclick="toggleScenPanel()" style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none">
+      <span style="font-size:13px;font-weight:800;white-space:nowrap">${s.ikon} ${s.namn}</span>
+      <span style="font-size:17px;font-weight:800;color:${col}">${nS.toFixed(1)}%</span>
+      <span style="font-size:10px;color:${col};white-space:nowrap">${diff>=0?'+':''}${diff.toFixed(1)}</span>
+      <span style="font-size:10px;color:var(--text-dim);white-space:nowrap">S ${mand.S||0} mand</span>
+      <span style="font-size:10px;color:var(--text-dim);white-space:nowrap">🔴${vMand} 🔵${hMand}</span>
+      <span style="margin-left:auto;font-size:10px;color:var(--text-dim)">${scenExpanded?'▲':'▼'}</span>
+    </div>`;
+  if(!scenExpanded){el.innerHTML=head;el.style.display='block';return}
+
+  const order=['S','M','SD','V','L','C','KD','MP'];
+  let rows=order.map(k=>{
+    const nv=(nParti[k]||0)/nTot*100, bv=(bParti[k]||0)/bTot*100, dd=nv-bv;
+    return `<tr><td style="padding:2px 6px 2px 0;font-weight:700">${k}</td>
+      <td style="padding:2px 6px;text-align:right;color:var(--text-dim)">${bv.toFixed(1)}</td>
+      <td style="padding:2px 6px;text-align:right;font-weight:700">${nv.toFixed(1)}</td>
+      <td style="padding:2px 6px;text-align:right;color:${dd>=0?'#4ade80':'#f87171'}">${dd>=0?'+':''}${dd.toFixed(1)}</td>
+      <td style="padding:2px 0 2px 6px;text-align:right;font-weight:700">${mand[k]||0}</td>
+      <td style="padding:2px 0;text-align:right;color:var(--text-dim);font-size:9px">(${bMand[k]||0})</td></tr>`}).join('');
+  el.innerHTML=head+`
+    <div style="font-size:10px;color:var(--text-dim);margin:6px 0 8px">${s.txt}</div>
+    <table style="font-size:11px;width:100%;border-collapse:collapse">
+      <tr style="color:var(--text-dim);font-size:9px;text-transform:uppercase">
+        <td></td><td style="text-align:right">2022</td><td style="text-align:right">Scen.</td>
+        <td style="text-align:right">Δ</td><td style="text-align:right">Mand</td><td style="text-align:right">(2022)</td></tr>
+      ${rows}
+    </table>
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--card-border);font-size:11px;display:flex;justify-content:space-between">
+      <span>🔴 V-block <b>${vBlock.toFixed(1)}%</b> · <b>${vMand}</b></span>
+      <span>🔵 H-block <b>${hBlock.toFixed(1)}%</b> · <b>${hMand}</b></span>
+    </div>
+    <div style="margin-top:4px;font-size:9px;color:var(--text-dim);line-height:1.4">
+      ${nRb.toLocaleString('sv-SE')} röstberättigade (+5,7%) · ${nTot.toLocaleString('sv-SE')} röster · oförändrat valdeltagande · 61 mandat, 2% spärr
+      ${vMand>=31?' · <b style="color:#4ade80">V-block egen majoritet</b>':(hMand>=31?' · <b style="color:#f87171">H-block egen majoritet</b>':' · ingen egen majoritet')}
+    </div>`;
+  el.style.display='block';
+}
 // Profil: M+L starka (borgerligt men liberalt), SD svagt (ej konservativ höger),
 // och S inom räckhåll för M (jämn kamp = mjuka M-väljare avgör).
 function isMagda(d){
@@ -1726,7 +1947,10 @@ function openPanel(d){
   // Reset year toggle
   document.querySelectorAll('.year-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
 
-  renderPanelParties(d,2022);
+  const scenBtn=document.getElementById('scenYearBtn');
+  if(scenBtn)scenBtn.style.display=currentScenario==='none'?'none':'';
+  if(currentScenario!=='none'){panelYear='scen';setPanelYear('scen')}
+  else renderPanelParties(d,2022);
   document.getElementById('pkprio').textContent=k.prio||'';
   document.getElementById('pkrubrik').textContent=k.rubrik||'';
   document.getElementById('pktext').textContent=k.valanalys||'';
@@ -1745,10 +1969,20 @@ function setPanelYear(year){
   panelYear=year;
   document.querySelectorAll('.year-btn').forEach(b=>{
     const txt=b.textContent.trim();
-    const bYear=txt==='KF 2022'?2022:txt==='KF 2018'?2018:txt==='RD 2022'?'rd':'compare';
+    const bYear=txt==='KF 2022'?2022:txt==='KF 2018'?2018:txt==='RD 2022'?'rd':txt==='Scenario'?'scen':'compare';
     b.classList.toggle('active',bYear===year);
   });
   if(currentPanelDistrikt)renderPanelParties(currentPanelDistrikt,year);
+}
+
+// Visar/döljer Scenario-knappen och ritar om panelen när scenariot byts
+function syncScenarioPanel(){
+  const b=document.getElementById('scenYearBtn');
+  if(b)b.style.display=currentScenario==='none'?'none':'';
+  if(!currentPanelDistrikt)return;
+  if(currentScenario==='none'&&panelYear==='scen')setPanelYear(2022);
+  else if(currentScenario!=='none')setPanelYear('scen');
+  else renderPanelParties(currentPanelDistrikt,panelYear);
 }
 
 function renderPanelParties(d,year){
@@ -1775,6 +2009,33 @@ function renderPanelParties(d,year){
     if(!rd){el.innerHTML='<div style="padding:12px;text-align:center;color:var(--text-muted)">Ingen riksdagsdata</div>';return}
     const sorted=Object.entries(rd).sort((a,b)=>b[1]-a[1]);
     el.innerHTML=sorted.map(([pt,v])=>`<div class="p-row" style="margin-bottom:5px"><span class="p-lbl" style="color:${PC[pt]||'#999'}">${pt}</span><div class="p-bar-bg"><div class="p-bar" style="width:${Math.min(v/42*100,100)}%;background:${PC[pt]||'#999'}"></div></div><span class="p-val" style="color:${PC[pt]||'#999'}">${v}%</span></div>`).join('');
+  }
+  else if(year==='scen'){
+    if(currentScenario==='none'){el.innerHTML='<div style="padding:12px;text-align:center;color:var(--text-muted)">Välj ett scenario på kartan först</div>';return}
+    const sc=SCENARIOS[currentScenario];
+    const np=scenParty(d,currentScenario);
+    const rr=scenRoster(d,currentScenario);
+    const magda=isMagda(d);
+    label.textContent=sc.ikon+' '+sc.namn+' – prognos för '+d.namn;
+    const sorted=Object.entries(np).sort((a,b)=>b[1]-a[1]);
+    el.innerHTML=
+      `<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">
+        ${magda?'🌹 <b>Magdamoderat-distrikt</b> – full sving tillämpad':'Ordinarie distrikt'} ·
+        ${rr.rb.toLocaleString('sv-SE')} röstberättigade (+5,7%) · ${rr.roster.toLocaleString('sv-SE')} röster vid ${d.valdeltagande}% deltagande
+      </div>`
+      +sorted.map(([pt,v])=>{
+        const b=d.partier[pt]||0;const diff=+(v-b).toFixed(1);
+        const col=PC[pt]||'#999';
+        const dc=diff>0?'var(--green)':diff<0?'var(--red)':'var(--text-muted)';
+        return `<div class="p-row" style="margin-bottom:5px">
+          <span class="p-lbl" style="color:${col}">${pt}</span>
+          <div class="p-bar-bg"><div class="p-bar" style="width:${Math.min(v/42*100,100)}%;background:${col}"></div></div>
+          <span class="p-val" style="color:${col}">${v.toFixed(1)}%</span>
+          <span style="font-size:9px;font-weight:700;color:${dc};min-width:34px;text-align:right">${diff>0?'+':''}${diff}</span>
+        </div>`}).join('')
+      +`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--card-border);font-size:10px;color:var(--text-muted)">
+         Jämfört med kommunvalet 2022. Befolkningstillväxt 5,7%, oförändrat valdeltagande.
+       </div>`;
   }
   else if(year==='compare'){
     label.textContent='Röstklyvning: Kommun vs Riksdag 2022';
