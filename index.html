@@ -1280,9 +1280,9 @@ function setMapMode(mode,btn){setMode(mode,btn);}
 // Tre utfall byggda på den faktiska svingen 2018→2022:
 // Magdamoderat-distrikten gav S +5,20 pp medan övriga Järfälla gav +2,59 pp.
 // Bull = svingen upprepas. Neutral = halva svingen. Bear = riksmotvind.
-// Befolkningen antas växa 5,7% sedan 2022 (Järfälla ~85 300 → ~90 200 invånare).
+// Röstberättigade har ökat 8,9% sedan 2022 (63 898 -> 69 611, Valmyndigheten 14 aug 2026).
 // Valdeltagandet per distrikt hålls oförändrat.
-const POP_GROWTH=0.057;
+const POP_GROWTH=0.0894;  // faktisk ökning röstberättigade 63 898 (2022) -> 69 611 (2026)
 const SCENARIOS={
   bear:    {namn:'Bear',   ikon:'🐻', txt:'Riksmotvind. S tappar, M och SD återhämtar sig.',
             sMagda:-1.0, sOther:-2.5, M:+2.0, SD:+1.0, L:-1.5, V:-0.5, C:+0.5, KD:+0.5, MP:-0.1},
@@ -1410,7 +1410,7 @@ function renderScenPanel(){
       <span>🔵 H-block <b>${hBlock.toFixed(1)}%</b> · <b>${hMand}</b></span>
     </div>
     <div style="margin-top:4px;font-size:9px;color:var(--text-dim);line-height:1.4">
-      ${nRb.toLocaleString('sv-SE')} röstberättigade (+5,7%) · ${nTot.toLocaleString('sv-SE')} röster · oförändrat valdeltagande · 61 mandat, 2% spärr
+      ${nRb.toLocaleString('sv-SE')} röstberättigade (+8,9%) · ${nTot.toLocaleString('sv-SE')} röster · oförändrat valdeltagande · 61 mandat, 2% spärr
       ${vMand>=31?' · <b style="color:#4ade80">V-block egen majoritet</b>':(hMand>=31?' · <b style="color:#f87171">H-block egen majoritet</b>':' · ingen egen majoritet')}
     </div>`;
   el.style.display='block';
@@ -1910,7 +1910,7 @@ function renderPanelParties(d,year){
     el.innerHTML=
       `<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">
         ${magda?'🌹 <b>Magdamoderat-distrikt</b> – full sving tillämpad':'Ordinarie distrikt'} ·
-        ${rr.rb.toLocaleString('sv-SE')} röstberättigade (+5,7%) · ${rr.roster.toLocaleString('sv-SE')} röster vid ${d.valdeltagande}% deltagande
+        ${rr.rb.toLocaleString('sv-SE')} röstberättigade (+8,9%) · ${rr.roster.toLocaleString('sv-SE')} röster vid ${d.valdeltagande}% deltagande
       </div>`
       +sorted.map(([pt,v])=>{
         const b=d.partier[pt]||0;const diff=+(v-b).toFixed(1);
@@ -1923,7 +1923,7 @@ function renderPanelParties(d,year){
           <span style="font-size:9px;font-weight:700;color:${dc};min-width:34px;text-align:right">${diff>0?'+':''}${diff}</span>
         </div>`}).join('')
       +`<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--card-border);font-size:10px;color:var(--text-muted)">
-         Jämfört med kommunvalet 2022. Befolkningstillväxt 5,7%, oförändrat valdeltagande.
+         Jämfört med kommunvalet 2022. Fler röstberättigade (+8,9%), oförändrat valdeltagande.
        </div>`;
   }
   else if(year==='compare'){
@@ -1992,96 +1992,135 @@ function zoomToDistrikt(d){
 }
 
 // ══ FÖRTIDSRÖSTER ══
-const FTR_SNAP={"days":["2026-08-26","2026-08-27","2026-08-28","2026-08-29","2026-08-30","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-05","2026-09-06","2026-09-07","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-12","2026-09-13"],"lokaler":[{"n":"Ambulerande röstmottagning","v":[0,28,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Biblioteket i BAS Barkarby","v":[139,72,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Centrumgallerian Jakobsberg","v":[459,460,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Huset på höjden","v":[40,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Barkarby","v":[58,93,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Kallhäll","v":[195,162,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Viksjöträffen","v":[209,215,153,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"lan":{"Upplands Väsby":[778,683,339,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vallentuna":[383,426,198,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Österåker":[838,877,489,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Värmdö":[822,782,362,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Järfälla":[1100,1068,537,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ekerö":[341,342,209,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Huddinge":[1552,1390,557,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Botkyrka":[1358,1491,735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Salem":[174,165,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Haninge":[1100,1170,650,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tyresö":[924,768,405,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Upplands-Bro":[250,313,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nykvarn":[0,181,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Täby":[1249,1104,540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Danderyd":[539,522,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sollentuna":[846,721,341,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Stockholm":[17569,15866,6679,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Södertälje":[1486,1475,654,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nacka":[1596,1648,772,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sundbyberg":[698,340,410,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Solna":[957,1045,477,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lidingö":[732,599,282,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vaxholm":[165,147,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norrtälje":[1375,1428,823,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sigtuna":[752,729,328,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nynäshamn":[467,550,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"riket":[297108,311802,154492,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"hamtad":"2026-08-28"};
+const FTR_SNAP={"days":["2026-08-26","2026-08-27","2026-08-28","2026-08-29","2026-08-30","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-05","2026-09-06","2026-09-07","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-12","2026-09-13"],"lokaler":[{"n":"Ambulerande röstmottagning","v":[0,28,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Biblioteket i BAS Barkarby","v":[139,72,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Centrumgallerian Jakobsberg","v":[459,460,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Huset på höjden","v":[40,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Barkarby","v":[58,93,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Kallhäll","v":[195,162,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Viksjöträffen","v":[209,215,153,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"kommun":{"Upplands Väsby":[778,683,339,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vallentuna":[383,426,198,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Österåker":[838,877,489,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Värmdö":[822,782,362,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Järfälla":[1100,1068,537,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ekerö":[341,342,209,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Huddinge":[1552,1390,557,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Botkyrka":[1358,1491,735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Salem":[174,165,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Haninge":[1100,1170,650,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tyresö":[924,768,405,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Upplands-Bro":[250,313,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nykvarn":[0,181,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Täby":[1249,1104,540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Danderyd":[539,522,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sollentuna":[846,721,341,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Stockholm":[17569,15866,6679,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Södertälje":[1486,1475,654,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nacka":[1596,1648,772,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sundbyberg":[698,340,410,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Solna":[957,1045,477,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lidingö":[732,599,282,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vaxholm":[165,147,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norrtälje":[1375,1428,823,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sigtuna":[752,729,328,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nynäshamn":[467,550,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Håbo":[251,238,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Älvkarleby":[102,0,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Knivsta":[245,228,72,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Heby":[154,162,82,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tierp":[91,120,113,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Uppsala":[3824,3683,1528,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Enköping":[588,682,329,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Östhammar":[80,25,129,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vingåker":[166,148,115,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gnesta":[216,227,124,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nyköping":[788,806,424,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Oxelösund":[0,243,148,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Flen":[223,289,149,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Katrineholm":[458,457,246,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Eskilstuna":[1669,1795,800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Strängnäs":[721,700,227,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Trosa":[397,214,215,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ödeshög":[74,66,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ydre":[21,60,35,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kinda":[180,151,139,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Boxholm":[72,123,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Åtvidaberg":[132,237,120,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Finspång":[319,319,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Valdemarsvik":[122,191,94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Linköping":[1790,2050,995,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norrköping":[2053,2460,1186,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Söderköping":[217,230,139,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Motala":[337,539,147,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vadstena":[0,0,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mjölby":[340,394,111,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Aneby":[0,92,78,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gnosjö":[54,119,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mullsjö":[85,166,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Habo":[193,193,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gislaved":[332,391,162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vaggeryd":[214,144,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Jönköping":[2340,2237,1177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nässjö":[412,430,285,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Värnamo":[299,349,56,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sävsjö":[111,15,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vetlanda":[327,335,191,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Eksjö":[213,181,133,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tranås":[268,331,174,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Uppvidinge":[33,44,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lessebo":[73,55,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tingsryd":[0,163,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Alvesta":[172,315,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Älmhult":[220,294,101,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Markaryd":[152,165,37,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Växjö":[1302,1245,408,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ljungby":[167,233,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Högsby":[41,64,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Torsås":[119,122,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mörbylånga":[290,311,237,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hultsfred":[135,264,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mönsterås":[0,0,89,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Emmaboda":[101,114,65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kalmar":[875,1075,281,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nybro":[262,252,157,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Oskarshamn":[478,312,184,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Västervik":[512,643,470,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vimmerby":[135,153,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Borgholm":[0,210,290,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gotland":[907,1038,581,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Olofström":[164,198,102,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Karlskrona":[776,914,558,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ronneby":[446,395,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Karlshamn":[562,524,296,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sölvesborg":[315,257,139,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Svalöv":[102,41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Staffanstorp":[309,378,180,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Burlöv":[197,269,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vellinge":[521,609,218,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Östra Göinge":[103,233,46,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Örkelljunga":[177,116,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bjuv":[79,133,164,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kävlinge":[525,529,270,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lomma":[359,368,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Svedala":[300,267,103,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Skurup":[184,287,144,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sjöbo":[156,360,140,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hörby":[181,156,103,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Höör":[247,264,102,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tomelilla":[0,0,440,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bromölla":[262,298,146,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Osby":[163,80,73,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Perstorp":[149,171,70,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Klippan":[241,249,201,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Åstorp":[169,164,109,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Båstad":[291,263,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Malmö":[7410,7453,2976,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lund":[2068,2032,1165,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Landskrona":[397,413,218,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Helsingborg":[2642,3022,1462,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Höganäs":[421,409,200,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Eslöv":[522,592,258,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ystad":[571,707,308,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Trelleborg":[335,812,462,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kristianstad":[1083,994,535,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Simrishamn":[471,448,157,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ängelholm":[579,909,474,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hässleholm":[531,736,569,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hylte":[101,120,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Halmstad":[1041,1465,738,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Laholm":[353,353,228,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Falkenberg":[534,652,314,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Varberg":[1108,1078,671,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kungsbacka":[1204,1218,494,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Härryda":[497,486,258,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Partille":[702,687,337,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Öckerö":[237,203,121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Stenungsund":[396,362,212,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tjörn":[213,228,146,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Orust":[169,246,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sotenäs":[254,199,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Munkedal":[25,104,204,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tanum":[123,150,73,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Dals-Ed":[82,63,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Färgelanda":[89,95,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ale":[395,422,150,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lerum":[462,456,226,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vårgårda":[0,132,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bollebygd":[88,0,93,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Grästorp":[50,131,80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Essunga":[65,132,54,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Karlsborg":[105,149,96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gullspång":[20,36,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tranemo":[0,0,74,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bengtsfors":[119,104,85,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mellerud":[82,86,30,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lilla Edet":[137,142,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mark":[379,442,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Svenljunga":[0,0,96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Herrljunga":[154,96,82,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vara":[214,215,138,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Götene":[27,161,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tibro":[0,0,94,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Töreboda":[85,161,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Göteborg":[8698,9664,4009,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mölndal":[911,929,430,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kungälv":[659,957,334,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lysekil":[273,237,125,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Uddevalla":[911,928,484,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Strömstad":[0,0,171,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vänersborg":[367,747,462,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Trollhättan":[1026,1077,476,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Alingsås":[659,590,254,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Borås":[2099,2144,1100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ulricehamn":[333,350,189,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Åmål":[0,0,108,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mariestad":[353,332,194,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lidköping":[581,617,351,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Skara":[239,281,134,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Skövde":[659,733,269,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hjo":[177,208,79,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tidaholm":[193,226,136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Falköping":[347,337,213,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kil":[151,40,148,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Eda":[105,96,49,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Torsby":[219,179,155,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Storfors":[34,45,25,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hammarö":[238,220,149,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Munkfors":[53,102,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Forshaga":[98,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Grums":[69,27,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Årjäng":[119,184,79,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sunne":[0,0,112,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Karlstad":[1475,1564,424,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kristinehamn":[385,442,229,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Filipstad":[0,0,149,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hagfors":[0,0,188,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Arvika":[378,373,205,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Säffle":[207,221,153,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lekeberg":[0,0,233,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Laxå":[80,90,65,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hallsberg":[140,110,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Degerfors":[92,98,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hällefors":[0,10,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ljusnarsberg":[89,91,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Örebro":[2232,2321,1201,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kumla":[347,435,165,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Askersund":[86,114,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Karlskoga":[507,510,253,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nora":[112,171,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lindesberg":[195,210,171,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Skinnskatteberg":[65,74,59,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Surahammar":[130,183,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kungsör":[118,100,105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hallstahammar":[302,229,170,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norberg":[77,77,51,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Västerås":[1957,2091,1005,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sala":[354,343,203,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Fagersta":[202,214,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Köping":[268,424,224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Arboga":[247,288,136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vansbro":[61,58,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Malung-Sälen":[199,160,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gagnef":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Leksand":[235,257,133,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Rättvik":[20,222,99,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Orsa":[73,134,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Älvdalen":[132,88,40,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Smedjebacken":[202,129,85,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Mora":[217,292,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Falun":[783,994,402,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Borlänge":[832,880,459,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Säter":[255,160,95,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hedemora":[224,207,117,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Avesta":[313,397,224,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ludvika":[559,516,251,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ockelbo":[125,154,82,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hofors":[154,206,71,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ovanåker":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nordanstig":[51,50,48,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ljusdal":[314,447,150,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gävle":[1427,1398,661,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sandviken":[469,692,340,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Söderhamn":[336,339,154,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bollnäs":[347,337,211,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Hudiksvall":[557,525,181,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ånge":[1,0,120,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Timrå":[288,325,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Härnösand":[417,449,262,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sundsvall":[1431,1523,743,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kramfors":[363,294,143,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sollefteå":[276,301,195,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Örnsköldsvik":[608,565,242,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ragunda":[114,94,50,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bräcke":[100,84,89,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Krokom":[140,240,62,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Strömsund":[205,0,161,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Åre":[221,166,82,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Berg":[77,128,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Härjedalen":[78,357,91,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Östersund":[799,1037,405,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nordmaling":[57,120,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Bjurholm":[36,23,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vindeln":[56,96,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Robertsfors":[85,91,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norsjö":[60,80,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Malå":[46,30,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Storuman":[141,139,53,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sorsele":[32,38,27,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Dorotea":[52,38,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vännäs":[0,0,163,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vilhelmina":[119,138,133,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Åsele":[45,44,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Umeå":[1849,1814,803,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lycksele":[0,20,355,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Skellefteå":[1233,1496,438,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Arvidsjaur":[137,112,106,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Arjeplog":[39,56,21,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Jokkmokk":[80,69,41,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Överkalix":[59,46,63,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kalix":[229,273,170,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Övertorneå":[48,65,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Pajala":[81,70,84,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Gällivare":[332,402,118,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Älvsbyn":[114,123,132,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Luleå":[1269,1309,560,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Piteå":[574,584,319,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Boden":[541,541,253,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Haparanda":[126,118,114,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Kiruna":[474,382,184,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"":[148554,155901,77246,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"hamtad":"2026-08-28"};
 var ftrData=FTR_SNAP;
+const RB_KOMMUN={"rb":{"Upplands Väsby":38780,"Vallentuna":27208,"Österåker":38482,"Värmdö":36132,"Järfälla":69611,"Ekerö":21860,"Huddinge":86928,"Botkyrka":73467,"Salem":13015,"Haninge":77516,"Tyresö":38355,"Upplands-Bro":25081,"Nykvarn":9425,"Täby":61000,"Danderyd":25332,"Sollentuna":59979,"Stockholm":802366,"Södertälje":79206,"Nacka":87259,"Sundbyberg":45353,"Solna":69745,"Lidingö":37515,"Vaxholm":9393,"Norrtälje":55138,"Sigtuna":39959,"Nynäshamn":24116,"Håbo":17945,"Älvkarleby":7600,"Knivsta":16227,"Heby":11452,"Tierp":16803,"Uppsala":197645,"Enköping":38195,"Östhammar":17983,"Vingåker":6994,"Gnesta":8912,"Nyköping":46256,"Oxelösund":9620,"Flen":12229,"Katrineholm":26919,"Eskilstuna":83612,"Strängnäs":31033,"Trosa":11804,"Ödeshög":4258,"Ydre":2967,"Kinda":7932,"Boxholm":4399,"Åtvidaberg":9199,"Finspång":17166,"Valdemarsvik":6243,"Linköping":134854,"Norrköping":114922,"Söderköping":11573,"Motala":34523,"Vadstena":6247,"Mjölby":22635,"Aneby":5368,"Gnosjö":7177,"Mullsjö":5915,"Habo":9872,"Gislaved":22500,"Vaggeryd":11490,"Jönköping":116520,"Nässjö":24548,"Värnamo":27291,"Sävsjö":8893,"Vetlanda":21545,"Eksjö":14080,"Tranås":14691,"Uppvidinge":7091,"Lessebo":6300,"Tingsryd":9728,"Alvesta":15382,"Älmhult":13315,"Markaryd":7867,"Växjö":76996,"Ljungby":22704,"Högsby":4194,"Torsås":5706,"Mörbylånga":12951,"Hultsfred":10789,"Mönsterås":10463,"Emmaboda":7151,"Kalmar":57789,"Nybro":15774,"Oskarshamn":21448,"Västervik":29611,"Vimmerby":12328,"Borgholm":9227,"Gotland":49469,"Olofström":10394,"Karlskrona":53183,"Ronneby":22747,"Karlshamn":25528,"Sölvesborg":14321,"Svalöv":11090,"Staffanstorp":20418,"Burlöv":15443,"Vellinge":29220,"Östra Göinge":10783,"Örkelljunga":8253,"Bjuv":12418,"Kävlinge":24940,"Lomma":18696,"Svedala":17430,"Skurup":13420,"Sjöbo":15603,"Hörby":12485,"Höör":13716,"Tomelilla":11041,"Bromölla":10020,"Osby":10187,"Perstorp":5561,"Klippan":14118,"Åstorp":12542,"Båstad":13205,"Malmö":288305,"Lund":105382,"Landskrona":37352,"Helsingborg":119936,"Höganäs":22713,"Eslöv":27143,"Ystad":26371,"Trelleborg":37525,"Kristianstad":68266,"Simrishamn":15876,"Ängelholm":36119,"Hässleholm":41411,"Hylte":7899,"Halmstad":84105,"Laholm":21154,"Falkenberg":37679,"Varberg":55592,"Kungsbacka":67149,"Härryda":30233,"Partille":31101,"Öckerö":10525,"Stenungsund":21812,"Tjörn":12975,"Orust":12704,"Sotenäs":7756,"Munkedal":8228,"Tanum":10450,"Dals-Ed":3718,"Färgelanda":5064,"Ale":24739,"Lerum":32757,"Vårgårda":9664,"Bollebygd":7604,"Grästorp":4598,"Essunga":4393,"Karlsborg":5861,"Gullspång":4158,"Tranemo":9398,"Bengtsfors":7394,"Mellerud":7330,"Lilla Edet":11174,"Mark":27764,"Svenljunga":8428,"Herrljunga":7631,"Vara":12895,"Götene":10575,"Tibro":8988,"Töreboda":7384,"Göteborg":490179,"Mölndal":56607,"Kungälv":39525,"Lysekil":11390,"Uddevalla":44748,"Strömstad":10687,"Vänersborg":31920,"Trollhättan":46304,"Alingsås":33688,"Borås":90596,"Ulricehamn":19799,"Åmål":9461,"Mariestad":19817,"Lidköping":32579,"Skara":14927,"Skövde":46151,"Hjo":7459,"Tidaholm":10163,"Falköping":25851,"Kil":9476,"Eda":6597,"Torsby":9336,"Storfors":3133,"Hammarö":12730,"Munkfors":2992,"Forshaga":8864,"Grums":7197,"Årjäng":7911,"Sunne":10774,"Karlstad":80401,"Kristinehamn":19367,"Filipstad":7892,"Hagfors":9454,"Arvika":20572,"Säffle":12054,"Lekeberg":6514,"Laxå":4410,"Hallsberg":12606,"Degerfors":7544,"Hällefors":5124,"Ljusnarsberg":3663,"Örebro":127167,"Kumla":17432,"Askersund":9355,"Karlskoga":24453,"Nora":8521,"Lindesberg":18485,"Skinnskatteberg":3502,"Surahammar":7709,"Kungsör":6706,"Hallstahammar":13013,"Norberg":4311,"Västerås":126853,"Sala":18071,"Fagersta":10135,"Köping":20467,"Arboga":11243,"Vansbro":5516,"Malung-Sälen":8410,"Gagnef":8072,"Leksand":13157,"Rättvik":9249,"Orsa":5757,"Älvdalen":5639,"Smedjebacken":8809,"Mora":16747,"Falun":47541,"Borlänge":40643,"Säter":8986,"Hedemora":12185,"Avesta":17935,"Ludvika":20952,"Ockelbo":4726,"Hofors":7419,"Ovanåker":9039,"Nordanstig":7430,"Ljusdal":15018,"Gävle":83269,"Sandviken":30740,"Söderhamn":19677,"Bollnäs":20987,"Hudiksvall":30386,"Ånge":7359,"Timrå":14118,"Härnösand":19478,"Sundsvall":79857,"Kramfors":14351,"Sollefteå":14724,"Örnsköldsvik":44347,"Ragunda":4173,"Bräcke":4958,"Krokom":12109,"Strömsund":8953,"Åre":9969,"Berg":5708,"Härjedalen":8388,"Östersund":52071,"Nordmaling":5628,"Bjurholm":1871,"Vindeln":4297,"Robertsfors":5361,"Norsjö":3052,"Malå":2313,"Storuman":4573,"Sorsele":1935,"Dorotea":1844,"Vännäs":7034,"Vilhelmina":5055,"Åsele":2177,"Umeå":107446,"Lycksele":9615,"Skellefteå":59715,"Arvidsjaur":4963,"Arjeplog":2144,"Jokkmokk":3871,"Överkalix":2668,"Kalix":12688,"Övertorneå":3365,"Pajala":4660,"Gällivare":13885,"Älvsbyn":6272,"Luleå":65233,"Piteå":34123,"Boden":22777,"Haparanda":7367,"Kiruna":17963,"Totalt":8401213},"lan":{"Upplands Väsby":"Stockholms","Vallentuna":"Stockholms","Österåker":"Stockholms","Värmdö":"Stockholms","Järfälla":"Stockholms","Ekerö":"Stockholms","Huddinge":"Stockholms","Botkyrka":"Stockholms","Salem":"Stockholms","Haninge":"Stockholms","Tyresö":"Stockholms","Upplands-Bro":"Stockholms","Nykvarn":"Stockholms","Täby":"Stockholms","Danderyd":"Stockholms","Sollentuna":"Stockholms","Stockholm":"Stockholms","Södertälje":"Stockholms","Nacka":"Stockholms","Sundbyberg":"Stockholms","Solna":"Stockholms","Lidingö":"Stockholms","Vaxholm":"Stockholms","Norrtälje":"Stockholms","Sigtuna":"Stockholms","Nynäshamn":"Stockholms","Håbo":"Uppsala","Älvkarleby":"Uppsala","Knivsta":"Uppsala","Heby":"Uppsala","Tierp":"Uppsala","Uppsala":"Uppsala","Enköping":"Uppsala","Östhammar":"Uppsala","Vingåker":"Södermanlands","Gnesta":"Södermanlands","Nyköping":"Södermanlands","Oxelösund":"Södermanlands","Flen":"Södermanlands","Katrineholm":"Södermanlands","Eskilstuna":"Södermanlands","Strängnäs":"Södermanlands","Trosa":"Södermanlands","Ödeshög":"Östergötlands","Ydre":"Östergötlands","Kinda":"Östergötlands","Boxholm":"Östergötlands","Åtvidaberg":"Östergötlands","Finspång":"Östergötlands","Valdemarsvik":"Östergötlands","Linköping":"Östergötlands","Norrköping":"Östergötlands","Söderköping":"Östergötlands","Motala":"Östergötlands","Vadstena":"Östergötlands","Mjölby":"Östergötlands","Aneby":"Jönköpings","Gnosjö":"Jönköpings","Mullsjö":"Jönköpings","Habo":"Jönköpings","Gislaved":"Jönköpings","Vaggeryd":"Jönköpings","Jönköping":"Jönköpings","Nässjö":"Jönköpings","Värnamo":"Jönköpings","Sävsjö":"Jönköpings","Vetlanda":"Jönköpings","Eksjö":"Jönköpings","Tranås":"Jönköpings","Uppvidinge":"Kronobergs","Lessebo":"Kronobergs","Tingsryd":"Kronobergs","Alvesta":"Kronobergs","Älmhult":"Kronobergs","Markaryd":"Kronobergs","Växjö":"Kronobergs","Ljungby":"Kronobergs","Högsby":"Kalmar","Torsås":"Kalmar","Mörbylånga":"Kalmar","Hultsfred":"Kalmar","Mönsterås":"Kalmar","Emmaboda":"Kalmar","Kalmar":"Kalmar","Nybro":"Kalmar","Oskarshamn":"Kalmar","Västervik":"Kalmar","Vimmerby":"Kalmar","Borgholm":"Kalmar","Gotland":"Gotlands","Olofström":"Blekinge","Karlskrona":"Blekinge","Ronneby":"Blekinge","Karlshamn":"Blekinge","Sölvesborg":"Blekinge","Svalöv":"Skåne","Staffanstorp":"Skåne","Burlöv":"Skåne","Vellinge":"Skåne","Östra Göinge":"Skåne","Örkelljunga":"Skåne","Bjuv":"Skåne","Kävlinge":"Skåne","Lomma":"Skåne","Svedala":"Skåne","Skurup":"Skåne","Sjöbo":"Skåne","Hörby":"Skåne","Höör":"Skåne","Tomelilla":"Skåne","Bromölla":"Skåne","Osby":"Skåne","Perstorp":"Skåne","Klippan":"Skåne","Åstorp":"Skåne","Båstad":"Skåne","Malmö":"Skåne","Lund":"Skåne","Landskrona":"Skåne","Helsingborg":"Skåne","Höganäs":"Skåne","Eslöv":"Skåne","Ystad":"Skåne","Trelleborg":"Skåne","Kristianstad":"Skåne","Simrishamn":"Skåne","Ängelholm":"Skåne","Hässleholm":"Skåne","Hylte":"Hallands","Halmstad":"Hallands","Laholm":"Hallands","Falkenberg":"Hallands","Varberg":"Hallands","Kungsbacka":"Hallands","Härryda":"Västra Götalands","Partille":"Västra Götalands","Öckerö":"Västra Götalands","Stenungsund":"Västra Götalands","Tjörn":"Västra Götalands","Orust":"Västra Götalands","Sotenäs":"Västra Götalands","Munkedal":"Västra Götalands","Tanum":"Västra Götalands","Dals-Ed":"Västra Götalands","Färgelanda":"Västra Götalands","Ale":"Västra Götalands","Lerum":"Västra Götalands","Vårgårda":"Västra Götalands","Bollebygd":"Västra Götalands","Grästorp":"Västra Götalands","Essunga":"Västra Götalands","Karlsborg":"Västra Götalands","Gullspång":"Västra Götalands","Tranemo":"Västra Götalands","Bengtsfors":"Västra Götalands","Mellerud":"Västra Götalands","Lilla Edet":"Västra Götalands","Mark":"Västra Götalands","Svenljunga":"Västra Götalands","Herrljunga":"Västra Götalands","Vara":"Västra Götalands","Götene":"Västra Götalands","Tibro":"Västra Götalands","Töreboda":"Västra Götalands","Göteborg":"Västra Götalands","Mölndal":"Västra Götalands","Kungälv":"Västra Götalands","Lysekil":"Västra Götalands","Uddevalla":"Västra Götalands","Strömstad":"Västra Götalands","Vänersborg":"Västra Götalands","Trollhättan":"Västra Götalands","Alingsås":"Västra Götalands","Borås":"Västra Götalands","Ulricehamn":"Västra Götalands","Åmål":"Västra Götalands","Mariestad":"Västra Götalands","Lidköping":"Västra Götalands","Skara":"Västra Götalands","Skövde":"Västra Götalands","Hjo":"Västra Götalands","Tidaholm":"Västra Götalands","Falköping":"Västra Götalands","Kil":"Värmlands","Eda":"Värmlands","Torsby":"Värmlands","Storfors":"Värmlands","Hammarö":"Värmlands","Munkfors":"Värmlands","Forshaga":"Värmlands","Grums":"Värmlands","Årjäng":"Värmlands","Sunne":"Värmlands","Karlstad":"Värmlands","Kristinehamn":"Värmlands","Filipstad":"Värmlands","Hagfors":"Värmlands","Arvika":"Värmlands","Säffle":"Värmlands","Lekeberg":"Örebro","Laxå":"Örebro","Hallsberg":"Örebro","Degerfors":"Örebro","Hällefors":"Örebro","Ljusnarsberg":"Örebro","Örebro":"Örebro","Kumla":"Örebro","Askersund":"Örebro","Karlskoga":"Örebro","Nora":"Örebro","Lindesberg":"Örebro","Skinnskatteberg":"Västmanlands","Surahammar":"Västmanlands","Kungsör":"Västmanlands","Hallstahammar":"Västmanlands","Norberg":"Västmanlands","Västerås":"Västmanlands","Sala":"Västmanlands","Fagersta":"Västmanlands","Köping":"Västmanlands","Arboga":"Västmanlands","Vansbro":"Dalarnas","Malung-Sälen":"Dalarnas","Gagnef":"Dalarnas","Leksand":"Dalarnas","Rättvik":"Dalarnas","Orsa":"Dalarnas","Älvdalen":"Dalarnas","Smedjebacken":"Dalarnas","Mora":"Dalarnas","Falun":"Dalarnas","Borlänge":"Dalarnas","Säter":"Dalarnas","Hedemora":"Dalarnas","Avesta":"Dalarnas","Ludvika":"Dalarnas","Ockelbo":"Gävleborgs","Hofors":"Gävleborgs","Ovanåker":"Gävleborgs","Nordanstig":"Gävleborgs","Ljusdal":"Gävleborgs","Gävle":"Gävleborgs","Sandviken":"Gävleborgs","Söderhamn":"Gävleborgs","Bollnäs":"Gävleborgs","Hudiksvall":"Gävleborgs","Ånge":"Västernorrlands","Timrå":"Västernorrlands","Härnösand":"Västernorrlands","Sundsvall":"Västernorrlands","Kramfors":"Västernorrlands","Sollefteå":"Västernorrlands","Örnsköldsvik":"Västernorrlands","Ragunda":"Jämtlands","Bräcke":"Jämtlands","Krokom":"Jämtlands","Strömsund":"Jämtlands","Åre":"Jämtlands","Berg":"Jämtlands","Härjedalen":"Jämtlands","Östersund":"Jämtlands","Nordmaling":"Västerbottens","Bjurholm":"Västerbottens","Vindeln":"Västerbottens","Robertsfors":"Västerbottens","Norsjö":"Västerbottens","Malå":"Västerbottens","Storuman":"Västerbottens","Sorsele":"Västerbottens","Dorotea":"Västerbottens","Vännäs":"Västerbottens","Vilhelmina":"Västerbottens","Åsele":"Västerbottens","Umeå":"Västerbottens","Lycksele":"Västerbottens","Skellefteå":"Västerbottens","Arvidsjaur":"Norrbottens","Arjeplog":"Norrbottens","Jokkmokk":"Norrbottens","Överkalix":"Norrbottens","Kalix":"Norrbottens","Övertorneå":"Norrbottens","Pajala":"Norrbottens","Gällivare":"Norrbottens","Älvsbyn":"Norrbottens","Luleå":"Norrbottens","Piteå":"Norrbottens","Boden":"Norrbottens","Haparanda":"Norrbottens","Kiruna":"Norrbottens","Totalt":"None"}};
 const FTR_URL='https://data.val.se/filer/val2026/rostmottagning/mottagna-fortidsroster-val2026.csv';
 
 function ftrTot(l){return l.v.reduce((a,b)=>a+b,0)}
+var ftrView='lokal';
+function setFtrView(v,btn){
+  ftrView=v;
+  document.querySelectorAll('.ftr-tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  renderFtr();
+}
+// Andel förtidsröstande per kommun, byggd på aktuell CSV + röstberättigade
+function ftrKommunAndelar(){
+  const d=ftrData;const out=[];
+  if(!d.kommun)return out;
+  for(const k in d.kommun){
+    const rb=RB_KOMMUN.rb[k];if(!rb)continue;
+    const n=d.kommun[k].reduce((a,b)=>a+b,0);
+    out.push({k:k,lan:RB_KOMMUN.lan[k]||'',n:n,rb:rb,p:n/rb*100});
+  }
+  out.sort((a,b)=>b.p-a.p);
+  return out;
+}
 function renderFtr(){
   const body=document.getElementById('ftrBody');if(!body)return;
   const d=ftrData;
   const lok=d.lokaler.slice().sort((a,b)=>ftrTot(b)-ftrTot(a));
   const tot=lok.reduce((a,l)=>a+ftrTot(l),0);
-  // dagar med data
   const aktiva=d.days.map((dag,i)=>({dag,sum:d.lokaler.reduce((a,l)=>a+l.v[i],0)})).filter(x=>x.sum>0);
   const sistaDag=aktiva.length?aktiva[aktiva.length-1]:null;
-  // länsjämförelse
-  let plac='',lanTot=0;
-  if(d.lan){
-    const arr=Object.entries(d.lan).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)]).sort((a,b)=>b[1]-a[1]);
-    const idx=arr.findIndex(x=>x[0]==='Järfälla');
-    if(idx>=0)plac=`Plats ${idx+1} av ${arr.length} i Stockholms län`;
-    lanTot=arr.reduce((a,x)=>a+x[1],0);
-  }
-  const RB=63898; // röstberättigade 2022 som referens
-  const andel=tot/RB*100;
+  const JRB=RB_KOMMUN.rb['Järfälla']||69611;
+  const andel=tot/JRB*100;
+  const alla=ftrKommunAndelar();
+  const rikPos=alla.findIndex(x=>x.k==='Järfälla')+1;
+  const lanArr=alla.filter(x=>x.lan==='Stockholms');
+  const lanPos=lanArr.findIndex(x=>x.k==='Järfälla')+1;
+  const rikSnitt=alla.length?alla.reduce((a,x)=>a+x.n,0)/alla.reduce((a,x)=>a+x.rb,0)*100:0;
+  const diff=andel-rikSnitt;
 
-  let html=`<div style="display:flex;gap:8px;margin-bottom:12px">
+  let html=`<div style="display:flex;gap:8px;margin-bottom:10px">
     <div style="flex:1;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px">
-      <div style="font-size:22px;font-weight:800;color:var(--red-mid)">${tot.toLocaleString('sv-SE')}</div>
-      <div style="font-size:9px;color:var(--text-dim)">förtidsröster totalt</div>
-    </div>
+      <div style="font-size:21px;font-weight:800;color:var(--red-mid)">${tot.toLocaleString('sv-SE')}</div>
+      <div style="font-size:9px;color:var(--text-dim)">förtidsröster</div></div>
     <div style="flex:1;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px">
-      <div style="font-size:22px;font-weight:800">${andel.toFixed(1)}%</div>
-      <div style="font-size:9px;color:var(--text-dim)">av röstberättigade 2022</div>
-    </div>
+      <div style="font-size:21px;font-weight:800;color:${diff>=0?'#4ade80':'#f87171'}">${andel.toFixed(2)}%</div>
+      <div style="font-size:9px;color:var(--text-dim)">av ${JRB.toLocaleString('sv-SE')} röstberättigade</div></div>
+  </div>
+  <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;line-height:1.5">
+    Riksgenomsnitt <b>${rikSnitt.toFixed(2)}%</b> (${diff>=0?'+':''}${diff.toFixed(2)} pp) ·
+    plats <b>${rikPos||'?'}</b> av ${alla.length} i riket · plats <b>${lanPos||'?'}</b> av ${lanArr.length} i länet
+    ${sistaDag?'<br>Senaste dag med siffror: '+sistaDag.dag:''}
+  </div>
+  <div class="map-controls" style="padding:0 0 10px;gap:5px">
+    <button class="map-ctrl-btn ftr-tab${ftrView==='lokal'?' active':''}" onclick="setFtrView('lokal',this)">Lokaler</button>
+    <button class="map-ctrl-btn ftr-tab${ftrView==='dag'?' active':''}" onclick="setFtrView('dag',this)">Dag för dag</button>
+    <button class="map-ctrl-btn ftr-tab${ftrView==='lan'?' active':''}" onclick="setFtrView('lan',this)">Stockholms län</button>
+    <button class="map-ctrl-btn ftr-tab${ftrView==='riket'?' active':''}" onclick="setFtrView('riket',this)">Riket</button>
   </div>`;
-  if(plac)html+=`<div style="font-size:10px;color:var(--text-dim);margin-bottom:12px">${plac}${sistaDag?' · senaste dag med siffror: '+sistaDag.dag:''}</div>`;
 
-  // Per lokal
-  const max=lok.length?ftrTot(lok[0]):1;
-  html+='<div style="font-size:11px;font-weight:800;margin-bottom:6px">PER RÖSTNINGSLOKAL</div>';
-  lok.forEach(l=>{
-    const t=ftrTot(l);const pct=max?t/max*100:0;
-    const idag=sistaDag?l.v[d.days.indexOf(sistaDag.dag)]:0;
-    html+=`<div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-        <span style="font-weight:600">${l.n}</span>
-        <span><b>${t.toLocaleString('sv-SE')}</b> <span style="color:var(--text-dim);font-size:9px">${idag?'(+'+idag+')':''}</span></span>
-      </div>
-      <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${pct}%;background:var(--red-mid);border-radius:3px"></div>
-      </div></div>`;
-  });
-
-  // Dag för dag
-  html+='<div style="font-size:11px;font-weight:800;margin:16px 0 6px">DAG FÖR DAG</div>';
-  const dmax=Math.max(...aktiva.map(x=>x.sum),1);
-  aktiva.forEach(x=>{
-    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px">
-      <span style="width:52px;color:var(--text-dim)">${x.dag.slice(5)}</span>
-      <div style="flex:1;height:14px;background:var(--surface);border-radius:3px;overflow:hidden">
-        <div style="height:100%;width:${x.sum/dmax*100}%;background:var(--red-mid)"></div></div>
-      <span style="width:44px;text-align:right;font-weight:700">${x.sum}</span></div>`;
-  });
+  if(ftrView==='lokal'){
+    const max=lok.length?ftrTot(lok[0]):1;
+    lok.forEach(l=>{
+      const t=ftrTot(l);const idag=sistaDag?l.v[d.days.indexOf(sistaDag.dag)]:0;
+      html+=`<div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span style="font-weight:600">${l.n}</span>
+          <span><b>${t.toLocaleString('sv-SE')}</b> <span style="color:var(--text-dim);font-size:9px">${idag?'+'+idag:''}</span></span></div>
+        <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${max?t/max*100:0}%;background:var(--red-mid);border-radius:3px"></div></div></div>`;
+    });
+  }
+  else if(ftrView==='dag'){
+    const dmax=Math.max(...aktiva.map(x=>x.sum),1);let ack=0;
+    aktiva.forEach(x=>{ack+=x.sum;
+      html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:10px">
+        <span style="width:48px;color:var(--text-dim)">${x.dag.slice(5)}</span>
+        <div style="flex:1;height:15px;background:var(--surface);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${x.sum/dmax*100}%;background:var(--red-mid)"></div></div>
+        <span style="width:42px;text-align:right;font-weight:700">${x.sum}</span>
+        <span style="width:52px;text-align:right;color:var(--text-dim);font-size:9px">${(ack/JRB*100).toFixed(2)}%</span></div>`;
+    });
+  }
+  else {
+    const list=ftrView==='lan'?lanArr:alla;
+    const show=ftrView==='lan'?list:list.slice(0,15);
+    const max=show.length?show[0].p:1;
+    html+=`<table style="width:100%;font-size:11px;border-collapse:collapse">`;
+    show.forEach((x,i)=>{
+      const me=x.k==='Järfälla';
+      html+=`<tr style="${me?'background:rgba(208,2,27,.12);font-weight:800':''}">
+        <td style="padding:4px 6px 4px 0;color:var(--text-dim);width:22px">${ftrView==='lan'?i+1:alla.indexOf(x)+1}</td>
+        <td style="padding:4px 4px 4px 0">${x.k}${me?' ←':''}</td>
+        <td style="padding:4px 0;width:78px">
+          <div style="height:5px;background:var(--surface);border-radius:3px;overflow:hidden">
+            <div style="height:100%;width:${max?x.p/max*100:0}%;background:${me?'var(--red-mid)':'var(--text-dim)'}"></div></div></td>
+        <td style="padding:4px 0 4px 8px;text-align:right;width:48px">${x.p.toFixed(2)}%</td>
+        <td style="padding:4px 0 4px 8px;text-align:right;color:var(--text-dim);font-size:9px;width:52px">${x.n.toLocaleString('sv-SE')}</td></tr>`;
+    });
+    html+='</table>';
+    if(ftrView==='riket'&&rikPos>15)
+      html+=`<div style="margin-top:8px;padding:8px;background:rgba(208,2,27,.12);border-radius:8px;font-size:11px;font-weight:800">
+        ${rikPos}. Järfälla — ${andel.toFixed(2)}% (${tot.toLocaleString('sv-SE')})</div>`;
+  }
 
   html+=`<div style="margin-top:14px;padding:10px;background:var(--surface);border-radius:8px;font-size:10px;color:var(--text-dim);line-height:1.5">
-    Källa: Valmyndigheten, uppdateras kl 6 och 14. Siffrorna bygger på den digitala väljarförteckningen och kan justeras fram till 16 september.
+    Källa: Valmyndigheten, uppdateras kl 6 och 14. Röstberättigade per kommun avser kvalifikationsdagen 14 augusti 2026.
     Ögonblicksbild hämtad ${d.hamtad}.</div>`;
   body.innerHTML=html;
   const sub=document.getElementById('ftrSub');
-  if(sub)sub.textContent=`${tot.toLocaleString('sv-SE')} röster · ${lok.length} lokaler`;
+  if(sub)sub.textContent=`${tot.toLocaleString('sv-SE')} röster · ${andel.toFixed(2)}% · plats ${rikPos||'?'} i riket`;
 }
-
 function parseFtrCsv(txt){
   const lines=txt.split(/\r?\n/).filter(x=>x.trim());
   const head=lines[0].replace(/^\uFEFF/,'').split(';');
   const days=head.filter(h=>/^2026-/.test(h));
   const di=days.map(d=>head.indexOf(d));
   const iKom=head.indexOf('KOMMUN'),iLok=head.indexOf('LOKAL'),iLan=head.indexOf('LÄN');
-  const lokaler=[],lan={};let riket=days.map(()=>0);
+  const lokaler=[],kommun={};
   for(let i=1;i<lines.length;i++){
     const c=lines[i].split(';');
     if(c.length<head.length)continue;
     const vals=di.map(j=>parseInt(c[j]||'0',10)||0);
-    vals.forEach((v,k)=>riket[k]+=v);
     if(c[iKom]==='Järfälla')lokaler.push({n:c[iLok],v:vals});
-    if(c[iLan]==='Stockholm'){
-      if(!lan[c[iKom]])lan[c[iKom]]=days.map(()=>0);
-      vals.forEach((v,k)=>lan[c[iKom]][k]+=v);
-    }
+    if(!kommun[c[iKom]])kommun[c[iKom]]=days.map(()=>0);
+    vals.forEach((v,k)=>kommun[c[iKom]][k]+=v);
   }
-  return {days,lokaler,lan,riket,hamtad:new Date().toISOString().slice(0,10)};
+  return {days,lokaler,kommun,hamtad:new Date().toISOString().slice(0,10)};
 }
 
 async function hamtaFtr(){
