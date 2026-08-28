@@ -2099,6 +2099,41 @@ function renderFtr(){
   else {
     const list=ftrView==='lan'?lanArr:alla;
     // Blockaggregat: väger förtidsröstningstakten i vänster- vs högerledande kommuner
+    // Kategorier efter blockmarginal 2022
+    const KAT=[
+      {id:'sv', lbl:'Starkt vänster',  sub:'+10 pp eller mer', c:'#8B0000', lo:10,  hi:999},
+      {id:'tv', lbl:'Tydligt vänster', sub:'+3 till +10 pp',   c:'#D0021B', lo:3,   hi:10},
+      {id:'jv', lbl:'Jämnt, V leder',  sub:'0 till +3 pp',     c:'#d94040', lo:0,   hi:3},
+      {id:'jh', lbl:'Jämnt, H leder',  sub:'0 till -3 pp',     c:'#7090c0', lo:-3,  hi:0},
+      {id:'th', lbl:'Tydligt höger',   sub:'-3 till -10 pp',   c:'#4070b0', lo:-10, hi:-3},
+      {id:'sh', lbl:'Starkt höger',    sub:'-10 pp eller mer', c:'#2D6FB5', lo:-999,hi:-10}
+    ];
+    function katFor(k){const b=BLOCK22[k];if(!b)return null;
+      return KAT.find(x=>b.m>=x.lo&&b.m<x.hi)||null;}
+    const kagg={};KAT.forEach(x=>kagg[x.id]={n:0,rb:0,k:0});
+    list.forEach(x=>{const kt=katFor(x.k);if(!kt)return;
+      kagg[kt.id].n+=x.n;kagg[kt.id].rb+=x.rb;kagg[kt.id].k++;});
+    const jfKat=katFor('Järfälla');
+    const fmt2=n=>n>=1e6?(n/1e6).toFixed(1).replace('.',',')+' milj':n.toLocaleString('sv-SE');
+    const maxP=Math.max(...KAT.map(x=>kagg[x.id].rb?kagg[x.id].n/kagg[x.id].rb*100:0),0.01);
+    html+=`<div style="font-size:11px;font-weight:800;margin-bottom:3px">FÖRTIDSRÖSTNING PER KATEGORI</div>
+      <div style="font-size:9px;color:var(--text-dim);margin-bottom:8px;line-height:1.5">
+        Riksdagsmandaten fördelas proportionellt över hela landet, så en röst väger lika mycket
+        oavsett kommun. Kategorierna visar därför <b>var det finns röster kvar att hämta</b>,
+        inte var rösterna är värda mest.</div>`;
+    KAT.forEach(x=>{const a=kagg[x.id];if(!a.k)return;
+      const p=a.rb?a.n/a.rb*100:0;const me=jfKat&&jfKat.id===x.id;
+      html+=`<div style="margin-bottom:7px;${me?'background:rgba(208,2,27,.10);border-radius:6px;padding:4px 6px;margin-left:-6px;margin-right:-6px':''}">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+          <span><span style="display:inline-block;width:7px;height:7px;border-radius:2px;background:${x.c};margin-right:5px"></span>
+            <b>${x.lbl}</b> <span style="color:var(--text-dim);font-size:9px">${x.sub}</span>${me?' <b style="color:var(--red-mid)">← Järfälla</b>':''}</span>
+          <span><b>${p.toFixed(2)}%</b></span></div>
+        <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden">
+          <div style="height:100%;width:${p/maxP*100}%;background:${x.c};border-radius:3px"></div></div>
+        <div style="font-size:9px;color:var(--text-dim);margin-top:2px">${a.k} kommuner · ${fmt2(a.rb)} röstberättigade</div>
+      </div>`;
+    });
+    html+=`<div style="height:10px"></div>`;
     let vN=0,vRb=0,hN=0,hRb=0,vK=0,hK=0;
     list.forEach(x=>{const b=BLOCK22[x.k];if(!b)return;
       if(b.m>0){vN+=x.n;vRb+=x.rb;vK++}else{hN+=x.n;hRb+=x.rb;hK++}});
@@ -2115,17 +2150,29 @@ function renderFtr(){
         <div style="font-size:17px;font-weight:800">${hP.toFixed(2)}%</div>
         <div style="font-size:9px;color:var(--text-dim)">${hK} kommuner · ${fmt(hRb)} röstber.</div></div>
     </div>
-    <div style="font-size:10px;color:var(--text-dim);margin-bottom:10px;line-height:1.5">
+    <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;line-height:1.5">
       <b>${led}</b> kommuner förtidsröstar mest, ${Math.abs(vP-hP).toFixed(2)} pp skillnad i takt.<br>
       Siffran är andel av de röstberättigade, inte antal röster. Högersidan har fler kommuner
       och fler röstberättigade totalt, så deras antal blir större även vid lägre takt.<br>
       Vänster = S+V+MP+C, höger = M+KD+L+SD. Blockindelning enligt riksdagsvalet 2022.</div>`;
+    // Mandatrelevant: överskott i råa röster jämfört med motståndarens takt
+    if(ftrView==='riket'&&vRb&&hRb){
+      const over=vN-vRb*(hN/hRb);
+      const MARG2022=46296;
+      const sign=over>=0?'+':'';
+      html+=`<div style="margin-bottom:10px;padding:9px;border-radius:8px;background:${over>=0?'rgba(74,222,128,.10)':'rgba(248,113,113,.10)'};font-size:10px;line-height:1.5">
+        <b style="font-size:12px;color:${over>=0?'#4ade80':'#f87171'}">${sign}${Math.round(over).toLocaleString('sv-SE')} röster</b>
+        har V-ledande kommuner lagt utöver vad de hade gjort i H-kommunernas takt.<br>
+        <span style="color:var(--text-dim)">Motsvarar ${Math.abs(100*over/MARG2022).toFixed(0)}% av marginalen mellan blocken 2022 (46 296 röster).
+        I ett proportionellt val räknas varje röst lika, oavsett var den läggs.</span></div>`;
+    }
     const show=ftrView==='lan'?list:list.slice(0,15);
     const max=show.length?show[0].p:1;
     html+=`<table style="width:100%;font-size:11px;border-collapse:collapse">`;
     show.forEach((x,i)=>{
       const me=x.k==='Järfälla';const b=BLOCK22[x.k];
-      const bc=b?(b.m>0?'#D0021B':'#2D6FB5'):'#666';
+      const kt=katFor(x.k);
+      const bc=kt?kt.c:'#666';
       const bl=b?(b.m>0?'+':'')+b.m:'';
       html+=`<tr style="${me?'background:rgba(208,2,27,.12);font-weight:800':''}">
         <td style="padding:4px 6px 4px 0;color:var(--text-dim);width:22px">${ftrView==='lan'?i+1:alla.indexOf(x)+1}</td>
