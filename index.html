@@ -547,13 +547,9 @@ function pickAddress(lat,lng,name){
   <button class="tab active" onclick="switchTab(0)">🗺 Karta</button>
   <button class="tab" onclick="switchTab(1)">📊 Resultat</button>
   <button class="tab" onclick="switchTab(2)">🎯 Strategi</button>
-  <button class="tab" onclick="switchTab(3)">📋 Prioritet</button>
-  <button class="tab" onclick="switchTab(4)">🏠 Dashboard</button>
-  <button class="tab" onclick="switchTab(5)">📅 Kalender</button>
-  <button class="tab" onclick="switchTab(6)">📈 Analys</button>
-  <button class="tab" onclick="switchTab(7)">🧮 Kalkylator</button>
-  <button class="tab" onclick="switchTab(8)">📋 Fältvy</button>
-  <button class="tab" onclick="switchTab(9)">🚪 Mobilisering</button>
+  <button class="tab" onclick="switchTab(3)">📈 Analys</button>
+  <button class="tab" onclick="switchTab(4)">🧮 Kalkylator</button>
+  <button class="tab" onclick="switchTab(5)">🗳️ Förtidsröster</button>
 </div>
 
 <!-- MAP -->
@@ -651,82 +647,6 @@ function pickAddress(lat,lng,name){
 <!-- PRIORITY -->
 <div class="page" id="page3">
   <div class="pg-header">
-    <h2>📋 Resursfördelning 2026</h2>
-    <p>Rekommenderade kampanjinsatser per distrikt</p>
-  </div>
-  <div class="toolbar" id="prioToolbar">
-    <button class="filter-btn active" data-filter="all" onclick="filterPrio('all',this)">Alla</button>
-    <button class="filter-btn" data-filter="topp" onclick="filterPrio('topp',this)">🔴 Topp</button>
-    <button class="filter-btn" data-filter="hog" onclick="filterPrio('hog',this)">🟠 Hög</button>
-    <button class="filter-btn" data-filter="medium" onclick="filterPrio('medium',this)">🟡 Medium</button>
-    <button class="filter-btn" data-filter="lag" onclick="filterPrio('lag',this)">🟢 Låg</button>
-  </div>
-  <div class="prio-list" id="prioList"></div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="page" id="page4">
-  <div class="pg-header" style="background:linear-gradient(135deg,#1a3a2a,#0d5c2e)">
-    <h2>🏠 Kampanj-Dashboard</h2>
-    <p>Fältarbetets status · Progress per distrikt · Intern uppföljning</p>
-  </div>
-  <div class="dash-grid" id="dashGrid"></div>
-  <div class="dash-filter">
-    <button class="filter-btn active" onclick="filterDash('all',this)">Alla</button>
-    <button class="filter-btn" onclick="filterDash('ej',this)">⬜ Ej påbörjat</button>
-    <button class="filter-btn" onclick="filterDash('pagaende',this)">🟡 Pågående</button>
-    <button class="filter-btn" onclick="filterDash('klart',this)">✅ Klart</button>
-  </div>
-  <div class="dash-section" id="dashDistricts"></div>
-  <div style="padding:12px;margin-top:8px">
-    <details id="adminPanel" style="background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:12px">
-      <summary onclick="return checkAdminPin(event)" style="font-size:11px;font-weight:700;color:var(--text-muted);cursor:pointer">⚙️ Admin – backup & återställning</summary>
-      <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
-        <button onclick="resetAllDoors()" style="padding:8px;border-radius:8px;border:1px solid rgba(231,76,60,.3);background:rgba(231,76,60,.08);color:#E74C3C;font-size:11px;font-weight:700;cursor:pointer">🗑 Nollställ ALL dörrdata</button>
-        <div style="display:flex;gap:6px">
-          <input type="date" id="restoreDate" style="flex:1;padding:6px;border-radius:6px;border:1px solid var(--card-border);background:var(--bg);color:var(--text);font-size:11px">
-          <button onclick="restoreDoorsBackup(document.getElementById('restoreDate').value)" style="padding:6px 12px;border-radius:6px;border:1px solid rgba(39,174,96,.3);background:rgba(39,174,96,.08);color:var(--green);font-size:11px;font-weight:700;cursor:pointer">↩ Återställ</button>
-        </div>
-      </div>
-    </details>
-  </div>
-</div>
-
-<!-- CALENDAR -->
-<div class="page" id="page5">
-  <div class="pg-header" style="background:linear-gradient(135deg,#2c1a3a,#5c0d3a)">
-    <h2>📅 Kampanjkalender 2026</h2>
-    <p>Viktiga datum · Deadlines · Planerade insatser</p>
-  </div>
-  <div class="cal-list" id="calList"></div>
-</div>
-
-<div class="cal-modal-overlay" id="calModalOverlay" onclick="if(event.target===this)closeCalModal()">
-  <div class="cal-modal">
-    <div class="cal-modal-title" id="calModalTitle">Ny händelse</div>
-    <div class="cal-field"><label>Datum</label><input type="date" id="calDate"></div>
-    <div class="cal-field"><label>Rubrik</label><input type="text" id="calTitle" placeholder="T.ex. Dörrknackning Jakobsberg"></div>
-    <div class="cal-field"><label>Beskrivning</label><textarea id="calDesc" placeholder="Detaljer, plats, ansvarig..."></textarea></div>
-    <div class="cal-field"><label>Typ</label>
-      <select id="calTag">
-        <option value="Fältarbete">Fältarbete</option>
-        <option value="Event">Event</option>
-        <option value="Planering">Planering</option>
-        <option value="Uppföljning">Uppföljning</option>
-        <option value="Deadline">Deadline</option>
-        <option value="Valdag">Valdag</option>
-      </select>
-    </div>
-    <div class="cal-modal-btns">
-      <button class="cal-modal-btn cancel" onclick="closeCalModal()">Avbryt</button>
-      <button class="cal-modal-btn save" onclick="saveCalEvent()">Spara</button>
-    </div>
-  </div>
-</div>
-
-<!-- ANALYSIS / SCATTER -->
-<div class="page" id="page6">
-  <div class="pg-header">
     <h2>📈 Dataanalys</h2>
     <p>S-styrka vs valdeltagande · Klicka på punkt för detaljer</p>
   </div>
@@ -764,7 +684,7 @@ function pickAddress(lat,lng,name){
 </div>
 
 <!-- CALCULATOR -->
-<div class="page" id="page7">
+<div class="page" id="page4">
   <div class="pg-header">
     <h2>🧮 Röstkalkylator & Mandatsimulering</h2>
     <p>Simulera deltagande · Ändra partistöd · Se mandateffekten direkt</p>
@@ -819,49 +739,17 @@ function pickAddress(lat,lng,name){
 </div>
 
 <!-- FIELD VIEW -->
-<div class="page" id="page8">
-  <div class="pg-header" style="background:linear-gradient(135deg,#1a3a1a,#2d6b2d)">
-    <h2>📋 Snabbvy för fältet</h2>
-    <p>Kompakt lista · Tryck för detaljer · Optimerad för utomhusbruk</p>
+<div class="page" id="page5">
+  <div class="pg-header" style="background:linear-gradient(135deg,#3a1a1a,#8b2d2d)">
+    <h2>🗳️ Förtidsröstning i Järfälla</h2>
+    <p id="ftrSub">Antal mottagna förtidsröster per lokal och dag</p>
   </div>
-  <div class="toolbar" id="fieldToolbar">
-    <button class="filter-btn active" onclick="filterField('all',this)">Alla</button>
-    <button class="filter-btn" onclick="filterField('topp',this)">🔴 Topp</button>
-    <button class="filter-btn" onclick="filterField('hog',this)">🟠 Hög</button>
-    <button class="filter-btn" onclick="filterField('medium',this)">🟡 Medium</button>
-    <button class="filter-btn" onclick="filterField('lag',this)">🟢 Låg</button>
+  <div style="padding:0 12px 12px">
+    <button class="map-ctrl-btn" style="width:100%;padding:10px;margin-bottom:10px" onclick="hamtaFtr()">🔄 Hämta senaste siffrorna</button>
+    <div id="ftrStatus" style="font-size:10px;color:var(--text-dim);margin-bottom:10px"></div>
+    <div id="ftrBody"></div>
   </div>
-  <div class="field-list" id="fieldList"></div>
 </div>
-
-<!-- MOBILISERING -->
-<div class="page" id="page9">
-  <div class="pg-header" style="background:linear-gradient(135deg,#1a1a3a,#2d2d8b)">
-    <h2>🚪 Mobiliseringsanalys</h2>
-    <p>Forskningsbaserad · 1 röst per 14 dörrar · ~20 dörrar/tim</p>
-  </div>
-  <div style="padding:12px;background:var(--surface);margin:8px 12px;border-radius:10px;font-size:11px;color:var(--text-dim);line-height:1.5">
-    <strong style="color:var(--text)">📚 Forskningsgrund:</strong> Gerber & Green (Yale) visar att dörrknackning ökar valdeltagande med ~7-9 procentenheter bland kontaktade. Kontaktfrekvens: 14-45% av hushåll nås. I praktiken: <strong style="color:var(--yellow)">1 ny röst per 14 dörrar</strong>. En volontär hinner ~20 dörrar/timme = <strong style="color:var(--yellow)">~1,4 nya röster/timme</strong>.
-  </div>
-  <div style="padding:0 12px 8px">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-      <div style="background:var(--card);border-radius:10px;padding:10px;text-align:center">
-        <div id="mobTotHemma" style="font-size:22px;font-weight:800;color:var(--red-mid)">0</div>
-        <div style="font-size:9px;color:var(--text-dim);margin-top:2px">HEMMASITTARE</div>
-      </div>
-      <div style="background:var(--card);border-radius:10px;padding:10px;text-align:center">
-        <div id="mobTotPot" style="font-size:22px;font-weight:800;color:var(--yellow)">0</div>
-        <div style="font-size:9px;color:var(--text-dim);margin-top:2px">POTENTIELLA S</div>
-      </div>
-      <div style="background:var(--card);border-radius:10px;padding:10px;text-align:center">
-        <div id="mobTotTim" style="font-size:22px;font-weight:800;color:var(--green)">0</div>
-        <div style="font-size:9px;color:var(--text-dim);margin-top:2px">VOLONTÄRTIMMAR</div>
-      </div>
-    </div>
-  </div>
-  <div class="field-list" id="mobList" style="padding-bottom:80px"></div>
-</div>
-
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
 <div class="panel" id="panel">
   <div class="panel-pill"></div>
@@ -1598,6 +1486,7 @@ renderKamp();
 const prioList=document.getElementById('prioList');const prioColors={topp:'#8B0012',hog:'#D0021B',medium:'#E8A317',lag:'#2D6FB5'};
 let prioFilterVal='all';
 function renderPrio(){
+  if(!document.getElementById('prioList'))return;
   prioList.innerHTML='';const sd=[...D].sort((a,b)=>(b.kampanj?.score||0)-(a.kampanj?.score||0));const mx=Math.max(...sd.map(d=>d.kampanj?.score||0));
   let rank=0;
   sd.forEach(d=>{
@@ -2101,7 +1990,128 @@ function zoomToDistrikt(d){
     });
   },100);
 }
-function switchTab(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));document.querySelectorAll('.page').forEach((pg,j)=>pg.classList.toggle('active',i===j));closePanel();setTimeout(applySearch,10);if(i===0)setTimeout(fitMap,50);if(i===8)renderFieldView();if(i===9)renderMobilization()}
+
+// ══ FÖRTIDSRÖSTER ══
+const FTR_SNAP={"days":["2026-08-26","2026-08-27","2026-08-28","2026-08-29","2026-08-30","2026-08-31","2026-09-01","2026-09-02","2026-09-03","2026-09-04","2026-09-05","2026-09-06","2026-09-07","2026-09-08","2026-09-09","2026-09-10","2026-09-11","2026-09-12","2026-09-13"],"lokaler":[{"n":"Ambulerande röstmottagning","v":[0,28,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Biblioteket i BAS Barkarby","v":[139,72,43,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Centrumgallerian Jakobsberg","v":[459,460,177,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Huset på höjden","v":[40,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Barkarby","v":[58,93,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Seniorträffen Kallhäll","v":[195,162,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"n":"Viksjöträffen","v":[209,215,153,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}],"lan":{"Upplands Väsby":[778,683,339,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vallentuna":[383,426,198,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Österåker":[838,877,489,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Värmdö":[822,782,362,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Järfälla":[1100,1068,537,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Ekerö":[341,342,209,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Huddinge":[1552,1390,557,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Botkyrka":[1358,1491,735,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Salem":[174,165,107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Haninge":[1100,1170,650,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Tyresö":[924,768,405,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Upplands-Bro":[250,313,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nykvarn":[0,181,116,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Täby":[1249,1104,540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Danderyd":[539,522,248,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sollentuna":[846,721,341,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Stockholm":[17569,15866,6679,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Södertälje":[1486,1475,654,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nacka":[1596,1648,772,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sundbyberg":[698,340,410,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Solna":[957,1045,477,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Lidingö":[732,599,282,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Vaxholm":[165,147,104,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Norrtälje":[1375,1428,823,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Sigtuna":[752,729,328,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"Nynäshamn":[467,550,179,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"riket":[297108,311802,154492,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"hamtad":"2026-08-28"};
+var ftrData=FTR_SNAP;
+const FTR_URL='https://data.val.se/filer/val2026/rostmottagning/mottagna-fortidsroster-val2026.csv';
+
+function ftrTot(l){return l.v.reduce((a,b)=>a+b,0)}
+function renderFtr(){
+  const body=document.getElementById('ftrBody');if(!body)return;
+  const d=ftrData;
+  const lok=d.lokaler.slice().sort((a,b)=>ftrTot(b)-ftrTot(a));
+  const tot=lok.reduce((a,l)=>a+ftrTot(l),0);
+  // dagar med data
+  const aktiva=d.days.map((dag,i)=>({dag,sum:d.lokaler.reduce((a,l)=>a+l.v[i],0)})).filter(x=>x.sum>0);
+  const sistaDag=aktiva.length?aktiva[aktiva.length-1]:null;
+  // länsjämförelse
+  let plac='',lanTot=0;
+  if(d.lan){
+    const arr=Object.entries(d.lan).map(([k,v])=>[k,v.reduce((a,b)=>a+b,0)]).sort((a,b)=>b[1]-a[1]);
+    const idx=arr.findIndex(x=>x[0]==='Järfälla');
+    if(idx>=0)plac=`Plats ${idx+1} av ${arr.length} i Stockholms län`;
+    lanTot=arr.reduce((a,x)=>a+x[1],0);
+  }
+  const RB=63898; // röstberättigade 2022 som referens
+  const andel=tot/RB*100;
+
+  let html=`<div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="flex:1;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px">
+      <div style="font-size:22px;font-weight:800;color:var(--red-mid)">${tot.toLocaleString('sv-SE')}</div>
+      <div style="font-size:9px;color:var(--text-dim)">förtidsröster totalt</div>
+    </div>
+    <div style="flex:1;background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:10px">
+      <div style="font-size:22px;font-weight:800">${andel.toFixed(1)}%</div>
+      <div style="font-size:9px;color:var(--text-dim)">av röstberättigade 2022</div>
+    </div>
+  </div>`;
+  if(plac)html+=`<div style="font-size:10px;color:var(--text-dim);margin-bottom:12px">${plac}${sistaDag?' · senaste dag med siffror: '+sistaDag.dag:''}</div>`;
+
+  // Per lokal
+  const max=lok.length?ftrTot(lok[0]):1;
+  html+='<div style="font-size:11px;font-weight:800;margin-bottom:6px">PER RÖSTNINGSLOKAL</div>';
+  lok.forEach(l=>{
+    const t=ftrTot(l);const pct=max?t/max*100:0;
+    const idag=sistaDag?l.v[d.days.indexOf(sistaDag.dag)]:0;
+    html+=`<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+        <span style="font-weight:600">${l.n}</span>
+        <span><b>${t.toLocaleString('sv-SE')}</b> <span style="color:var(--text-dim);font-size:9px">${idag?'(+'+idag+')':''}</span></span>
+      </div>
+      <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--red-mid);border-radius:3px"></div>
+      </div></div>`;
+  });
+
+  // Dag för dag
+  html+='<div style="font-size:11px;font-weight:800;margin:16px 0 6px">DAG FÖR DAG</div>';
+  const dmax=Math.max(...aktiva.map(x=>x.sum),1);
+  aktiva.forEach(x=>{
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:10px">
+      <span style="width:52px;color:var(--text-dim)">${x.dag.slice(5)}</span>
+      <div style="flex:1;height:14px;background:var(--surface);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${x.sum/dmax*100}%;background:var(--red-mid)"></div></div>
+      <span style="width:44px;text-align:right;font-weight:700">${x.sum}</span></div>`;
+  });
+
+  html+=`<div style="margin-top:14px;padding:10px;background:var(--surface);border-radius:8px;font-size:10px;color:var(--text-dim);line-height:1.5">
+    Källa: Valmyndigheten, uppdateras kl 6 och 14. Siffrorna bygger på den digitala väljarförteckningen och kan justeras fram till 16 september.
+    Ögonblicksbild hämtad ${d.hamtad}.</div>`;
+  body.innerHTML=html;
+  const sub=document.getElementById('ftrSub');
+  if(sub)sub.textContent=`${tot.toLocaleString('sv-SE')} röster · ${lok.length} lokaler`;
+}
+
+function parseFtrCsv(txt){
+  const lines=txt.split(/\r?\n/).filter(x=>x.trim());
+  const head=lines[0].replace(/^\uFEFF/,'').split(';');
+  const days=head.filter(h=>/^2026-/.test(h));
+  const di=days.map(d=>head.indexOf(d));
+  const iKom=head.indexOf('KOMMUN'),iLok=head.indexOf('LOKAL'),iLan=head.indexOf('LÄN');
+  const lokaler=[],lan={};let riket=days.map(()=>0);
+  for(let i=1;i<lines.length;i++){
+    const c=lines[i].split(';');
+    if(c.length<head.length)continue;
+    const vals=di.map(j=>parseInt(c[j]||'0',10)||0);
+    vals.forEach((v,k)=>riket[k]+=v);
+    if(c[iKom]==='Järfälla')lokaler.push({n:c[iLok],v:vals});
+    if(c[iLan]==='Stockholm'){
+      if(!lan[c[iKom]])lan[c[iKom]]=days.map(()=>0);
+      vals.forEach((v,k)=>lan[c[iKom]][k]+=v);
+    }
+  }
+  return {days,lokaler,lan,riket,hamtad:new Date().toISOString().slice(0,10)};
+}
+
+async function hamtaFtr(){
+  const st=document.getElementById('ftrStatus');
+  st.textContent='Hämtar…';
+  const proxies=[
+    u=>'https://corsproxy.io/?'+encodeURIComponent(u),
+    u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+    u=>u
+  ];
+  for(const p of proxies){
+    try{
+      const r=await fetch(p(FTR_URL),{cache:'no-store'});
+      if(!r.ok)continue;
+      const t=await r.text();
+      if(!/KOMMUN/.test(t))continue;
+      const d=parseFtrCsv(t);
+      if(d.lokaler.length){
+        ftrData=d;renderFtr();
+        st.textContent='Uppdaterad '+new Date().toLocaleString('sv-SE');
+        try{localStorage.setItem('ftr_cache',JSON.stringify(d))}catch(e){}
+        return;
+      }
+    }catch(e){}
+  }
+  st.textContent='Kunde inte hämta live. Visar senast sparade siffror.';
+}
+try{const cc=localStorage.getItem('ftr_cache');if(cc){const p=JSON.parse(cc);if(p.lokaler&&p.lokaler.length)ftrData=p}}catch(e){}
+
+function switchTab(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));document.querySelectorAll('.page').forEach((pg,j)=>pg.classList.toggle('active',i===j));closePanel();setTimeout(applySearch,10);if(i===0)setTimeout(fitMap,50);if(i===5)renderFtr()}
 let sy=0,panelScrollTop=0;
 const panelEl=document.getElementById('panel');
 const panelInner=panelEl.querySelector('.panel-inner');
@@ -2688,6 +2698,7 @@ function trendHTML(d){
 // ══════════════════════════════════════════
 let fieldFilter='all';
 function renderFieldView(){
+  if(!document.getElementById('fieldList'))return;
   const el=document.getElementById('fieldList');el.innerHTML='';
   const sorted=[...D].sort((a,b)=>(b.kampanj?.score||0)-(a.kampanj?.score||0));
   const prioColorsF={topp:'#8B0012',hog:'#D0021B',medium:'#E8A317',lag:'#2D6FB5'};
@@ -2879,6 +2890,7 @@ function findMyDistrikt(){
 // MOBILISERINGSVY
 // ══════════════════════════════════════════
 function renderMobilization(){
+  if(!document.getElementById('mobList'))return;
   const el=document.getElementById('mobList');el.innerHTML='';
   const DOORS_PER_VOTE=14;
   const DOORS_PER_HOUR=20;
@@ -2935,6 +2947,7 @@ function renderMobilization(){
 // ══════════════════════════════════════════
 let dashFilter='all';
 function renderDashboard(){
+  if(!document.getElementById('dashGrid'))return;
   const statuses=loadStatuses();
   const sorted=[...D].sort((a,b)=>(b.kampanj?.score||0)-(a.kampanj?.score||0));
   let ej=0,pag=0,kl=0;
@@ -3019,6 +3032,7 @@ function getCalEvents(){return loadCal()||DEFAULT_CAL.map(e=>({...e}))}
 let editingCalId=null;
 
 function renderCalendar(){
+  if(!document.getElementById('calList'))return;
   const el=document.getElementById('calList');el.innerHTML='';
   const events=getCalEvents().sort((a,b)=>a.date.localeCompare(b.date));
   const now=new Date();
