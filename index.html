@@ -763,6 +763,7 @@ function pickAddress(lat,lng,name){
     <div style="background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:6px;margin-bottom:10px">
       <svg id="vnMap" viewBox="0 0 560 760" style="width:100%;height:auto;display:block"></svg>
     </div>
+    <div id="vnDist"></div>
     <div id="vnBody"></div>
   </div>
 </div>
@@ -2414,22 +2415,33 @@ function ritaVnKarta(){
 }
 function vnKlick(kod){
   const R=vnDistrikt();const r=R[kod];const d=D.find(x=>x.code===kod);
-  const el=document.getElementById('vnBody');
-  if(!r){el.innerHTML=`<div style="padding:12px;background:var(--card);border-radius:10px">
-    <b>${d?d.namn:kod}</b><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Ej räknat än</div></div>`+el.innerHTML;return}
-  const ps=Object.entries(r.p).sort((a,b)=>b[1].pct-a[1].pct);
+  const el=document.getElementById('vnDist');
+  if(!r){el.innerHTML=`<div style="padding:12px;background:var(--card);border:1px solid var(--card-border);border-radius:10px;margin-bottom:10px">
+    <b>${d?d.namn:kod}</b><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Ej räknat än</div></div>`;return}
+  const ps=Object.entries(r.p).sort((a,b)=>b[1].a-a[1].a);
+  const dv=(r.vd!=null&&r.vd22!=null)?r.vd-r.vd22:null;
   el.innerHTML=`<div style="padding:12px;background:var(--card);border:1px solid var(--card-border);border-radius:10px;margin-bottom:10px">
-    <div style="font-size:14px;font-weight:800">${r.namn}</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline">
+      <span style="font-size:14px;font-weight:800">${r.namn}</span>
+      <span style="font-size:16px;font-weight:800">${r.tot.toLocaleString('sv-SE')}<span style="font-size:10px;color:var(--text-dim)"> röster</span></span>
+    </div>
     <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px">
-      ${r.tot} röster · valdeltagande ${r.vd?r.vd.toFixed(1):'–'}%
-      ${r.vd22?` (2022: ${r.vd22.toFixed(1)}%, ${(r.vd-r.vd22>=0?'+':'')+(r.vd-r.vd22).toFixed(1)})`:''}</div>
-    ${ps.map(([k,v])=>{
-      const dd=v.f!=null?v.pct-v.f:null;
-      return `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
-        <span style="font-weight:700;color:${PC&&PC[k]?PC[k]:'#999'}">${k}</span>
-        <span>${v.pct.toFixed(1)}% <span style="font-size:9px;color:var(--text-dim)">(${v.a})</span>
-        ${dd!=null?`<span style="color:${dd>=0?'#4ade80':'#f87171'};font-size:9px;margin-left:4px">${dd>=0?'+':''}${dd.toFixed(1)}</span>`:''}</span></div>`}).join('')}
-  </div>`+el.innerHTML;
+      ${r.rb?r.rb.toLocaleString('sv-SE')+' röstberättigade · ':''}valdeltagande <b>${r.vd!=null?r.vd.toFixed(1):'–'}%</b>
+      ${r.vd22!=null?` (2022: ${r.vd22.toFixed(1)}%, <span style="color:${dv>=0?'#4ade80':'#f87171'}">${dv>=0?'+':''}${dv.toFixed(1)}</span>)`:''}</div>
+    <table style="width:100%;font-size:11px;border-collapse:collapse">
+      <tr style="color:var(--text-dim);font-size:9px;text-transform:uppercase">
+        <td></td><td style="text-align:right">Röster</td><td style="text-align:right">Andel</td>
+        <td style="text-align:right">2022</td><td style="text-align:right">Δ</td></tr>
+      ${ps.map(([k,v])=>{
+        const dd=v.f!=null?v.pct-v.f:null;
+        return `<tr>
+          <td style="padding:2px 6px 2px 0;font-weight:700;color:${PC&&PC[k]?PC[k]:'#999'}">${k}</td>
+          <td style="padding:2px 6px;text-align:right;font-weight:700">${v.a.toLocaleString('sv-SE')}</td>
+          <td style="padding:2px 6px;text-align:right">${v.pct.toFixed(1)}%</td>
+          <td style="padding:2px 6px;text-align:right;color:var(--text-dim)">${v.f!=null?v.f.toFixed(1)+'%':'–'}</td>
+          <td style="padding:2px 0;text-align:right;color:${dd==null?'var(--text-dim)':(dd>=0?'#4ade80':'#f87171')}">${dd!=null?(dd>=0?'+':'')+dd.toFixed(1):'–'}</td></tr>`}).join('')}
+    </table>
+  </div>`;
 }
 function renderVn(){
   const el=document.getElementById('vnBody');if(!el)return;
