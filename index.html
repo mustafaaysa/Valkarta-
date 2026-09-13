@@ -742,6 +742,17 @@ function pickAddress(lat,lng,name){
 
 <!-- FIELD VIEW -->
 
+<div class="page" id="page5">
+  <div class="pg-header" style="background:linear-gradient(135deg,#3a1a1a,#8b2d2d)">
+    <h2>🗳️ Förtidsröstning i Järfälla</h2>
+    <p id="ftrSub">Antal mottagna förtidsröster per lokal och dag</p>
+  </div>
+  <div style="padding:0 12px 12px">
+    <button class="map-ctrl-btn" style="width:100%;padding:10px;margin-bottom:10px" onclick="hamtaFtr()">🔄 Hämta senaste siffrorna</button>
+    <div id="ftrStatus" style="font-size:10px;color:var(--text-dim);margin-bottom:10px"></div>
+    <div id="ftrBody"></div>
+  </div>
+</div>
 <div class="page" id="page6">
   <div class="pg-header" style="background:linear-gradient(135deg,#2a0a0a,#8B0000)">
     <h2>🔴 Valnatt 2026</h2>
@@ -765,17 +776,6 @@ function pickAddress(lat,lng,name){
     </div>
     <div id="vnDist"></div>
     <div id="vnBody"></div>
-  </div>
-</div>
-<div class="page" id="page5">
-  <div class="pg-header" style="background:linear-gradient(135deg,#3a1a1a,#8b2d2d)">
-    <h2>🗳️ Förtidsröstning i Järfälla</h2>
-    <p id="ftrSub">Antal mottagna förtidsröster per lokal och dag</p>
-  </div>
-  <div style="padding:0 12px 12px">
-    <button class="map-ctrl-btn" style="width:100%;padding:10px;margin-bottom:10px" onclick="hamtaFtr()">🔄 Hämta senaste siffrorna</button>
-    <div id="ftrStatus" style="font-size:10px;color:var(--text-dim);margin-bottom:10px"></div>
-    <div id="ftrBody"></div>
   </div>
 </div>
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
