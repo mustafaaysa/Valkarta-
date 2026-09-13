@@ -1,1 +1,2 @@
 /valdata/fortidsroster.csv https://data.val.se/filer/val2026/rostmottagning/mottagna-fortidsroster-val2026.csv 200
+/valres/* https://resultat.val.se/resultatfiler/val2026/:splat 200

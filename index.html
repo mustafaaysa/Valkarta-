@@ -504,6 +504,7 @@ function pickAddress(lat,lng,name){
   }
 }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 
@@ -550,6 +551,7 @@ function pickAddress(lat,lng,name){
   <button class="tab" onclick="switchTab(3)">📈 Analys</button>
   <button class="tab" onclick="switchTab(4)">🧮 Kalkylator</button>
   <button class="tab" onclick="switchTab(5)">🗳️ Förtidsröster</button>
+  <button class="tab" onclick="switchTab(6)">🔴 Valnatt</button>
 </div>
 
 <!-- MAP -->
@@ -739,6 +741,31 @@ function pickAddress(lat,lng,name){
 </div>
 
 <!-- FIELD VIEW -->
+
+<div class="page" id="page6">
+  <div class="pg-header" style="background:linear-gradient(135deg,#2a0a0a,#8B0000)">
+    <h2>🔴 Valnatt 2026</h2>
+    <p id="vnSub">Tryck uppdatera när vallokalerna stängt kl 20</p>
+  </div>
+  <div style="padding:0 12px 12px">
+    <button class="map-ctrl-btn" style="width:100%;padding:12px;margin-bottom:8px;font-size:14px"
+            onclick="hamtaValnatt()">🔄 Hämta live-resultat</button>
+    <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);margin-bottom:8px">
+      <input type="checkbox" id="vnAuto" onchange="toggleVnAuto()"> Uppdatera automatiskt varje 2 min
+    </label>
+    <div id="vnStatus" style="font-size:10px;color:var(--text-dim);margin-bottom:10px"></div>
+    <div class="map-controls" style="padding:0 0 8px;gap:5px">
+      <button class="map-ctrl-btn vn-tab active" onclick="setVnMode('S',this)">S-resultat</button>
+      <button class="map-ctrl-btn vn-tab" onclick="setVnMode('vd',this)">Valdeltagande</button>
+      <button class="map-ctrl-btn vn-tab" onclick="setVnMode('dS',this)">S mot 2022</button>
+      <button class="map-ctrl-btn vn-tab" onclick="setVnMode('dvd',this)">Valdelt. mot 2022</button>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--card-border);border-radius:10px;padding:6px;margin-bottom:10px">
+      <svg id="vnMap" viewBox="0 0 560 760" style="width:100%;height:auto;display:block"></svg>
+    </div>
+    <div id="vnBody"></div>
+  </div>
+</div>
 <div class="page" id="page5">
   <div class="pg-header" style="background:linear-gradient(135deg,#3a1a1a,#8b2d2d)">
     <h2>🗳️ Förtidsröstning i Järfälla</h2>
@@ -2310,7 +2337,135 @@ async function hamtaFtr(){
 }
 try{const cc=localStorage.getItem('ftr_cache');if(cc){const p=JSON.parse(cc);if(p.lokaler&&p.lokaler.length)ftrData=p}}catch(e){}
 
-function switchTab(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));document.querySelectorAll('.page').forEach((pg,j)=>pg.classList.toggle('active',i===j));closePanel();setTimeout(applySearch,10);if(i===0)setTimeout(fitMap,50);if(i===5)renderFtr()}
+
+// ══ VALNATT ══
+var vnData=null, vnMode='S', vnTimer=null;
+const VN_URLS=[
+  '/valres/p/kf/Val_2026_preliminar_0123_KF.zip',
+  'https://resultat.val.se/resultatfiler/val2026/p/kf/Val_2026_preliminar_0123_KF.zip'
+];
+function setVnMode(m,btn){
+  vnMode=m;
+  document.querySelectorAll('.vn-tab').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  ritaVnKarta();renderVn();
+}
+function toggleVnAuto(){
+  const on=document.getElementById('vnAuto').checked;
+  if(vnTimer){clearInterval(vnTimer);vnTimer=null}
+  if(on){vnTimer=setInterval(hamtaValnatt,120000);hamtaValnatt()}
+}
+async function hamtaValnatt(){
+  const st=document.getElementById('vnStatus');
+  st.textContent='Hämtar…';
+  for(const u of VN_URLS){
+    try{
+      const r=await fetch(u,{cache:'no-store'});
+      if(!r.ok)continue;
+      const buf=await r.arrayBuffer();
+      if(buf.byteLength<500)continue;
+      const zip=await JSZip.loadAsync(buf);
+      let f=null;
+      zip.forEach((p,e)=>{if(/rostfordelning.*\.json$/i.test(p))f=e});
+      if(!f)continue;
+      vnData=JSON.parse(await f.async('string'));
+      st.innerHTML='Uppdaterad '+new Date().toLocaleTimeString('sv-SE')+
+        ' · '+vnData.antalValdistriktRaknade+' av '+vnData.antalValdistriktSomSkaRaknas+' distrikt räknade';
+      ritaVnKarta();renderVn();
+      return;
+    }catch(e){}
+  }
+  st.innerHTML='<span style="color:#f87171">Inga resultat ännu.</span> Valmyndigheten publicerar efter kl 20. '+
+    '<span style="font-size:9px">Kräver raden /valres/* i _redirects.</span>';
+}
+function vnDistrikt(){
+  if(!vnData)return {};
+  const out={};
+  (vnData.valdistrikt||[]).forEach(d=>{
+    const pr={};
+    const rp=d.rostfordelning&&d.rostfordelning.rosterPaverkaMandat;
+    if(rp&&rp.partiRoster)rp.partiRoster.forEach(p=>{pr[p.partiforkortning]={a:p.antalRoster,pct:p.andelRoster,f:p.andelRosterForegaendeVal}});
+    out[d.valdistriktskod]={namn:d.namn,tot:d.totaltAntalRoster,rb:d.antalRostberattigade,
+      vd:d.valdeltagandeVallokal,vd22:d.valdeltagandeForegaendeVal,p:pr,tid:d.rapporteringsTid};
+  });
+  return out;
+}
+function vnFarg(d,bas){
+  if(!d)return 'var(--surface)';
+  if(vnMode==='S'){const v=d.p.S?d.p.S.pct:0;
+    return v>=40?'#6B0000':v>=34?'#8B0000':v>=30?'#c0001a':v>=27?'#d94040':v>=23?'#c06060':'#2c6fad';}
+  if(vnMode==='vd'){const v=d.vd||0;
+    return v>=80?'#1a5c1a':v>=70?'#2d8a2d':v>=60?'#7fb069':v>=50?'#e8a317':'#c0392b';}
+  if(vnMode==='dS'){const v=d.p.S?(d.p.S.pct-(d.p.S.f||0)):0;
+    return v>=5?'#6B0000':v>=2?'#c0001a':v>=0?'#d99090':v>=-2?'#90a8d9':'#2c6fad';}
+  if(vnMode==='dvd'){const v=(d.vd||0)-(d.vd22||0);
+    return v>=10?'#1a5c1a':v>=5?'#2d8a2d':v>=0?'#7fb069':v>=-5?'#e8a317':'#c0392b';}
+  return '#888';
+}
+function ritaVnKarta(){
+  const svg=document.getElementById('vnMap');if(!svg)return;
+  const R=vnDistrikt();
+  svg.innerHTML=D.map(d=>{
+    const r=R[d.code];
+    const fill=r?vnFarg(r):'rgba(255,255,255,.06)';
+    return `<path d="${d.path}" fill="${fill}" stroke="#0a0a0a" stroke-width="1"
+      style="cursor:pointer" onclick="vnKlick('${d.code}')"><title>${d.namn}</title></path>`;
+  }).join('');
+}
+function vnKlick(kod){
+  const R=vnDistrikt();const r=R[kod];const d=D.find(x=>x.code===kod);
+  const el=document.getElementById('vnBody');
+  if(!r){el.innerHTML=`<div style="padding:12px;background:var(--card);border-radius:10px">
+    <b>${d?d.namn:kod}</b><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Ej räknat än</div></div>`+el.innerHTML;return}
+  const ps=Object.entries(r.p).sort((a,b)=>b[1].pct-a[1].pct);
+  el.innerHTML=`<div style="padding:12px;background:var(--card);border:1px solid var(--card-border);border-radius:10px;margin-bottom:10px">
+    <div style="font-size:14px;font-weight:800">${r.namn}</div>
+    <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px">
+      ${r.tot} röster · valdeltagande ${r.vd?r.vd.toFixed(1):'–'}%
+      ${r.vd22?` (2022: ${r.vd22.toFixed(1)}%, ${(r.vd-r.vd22>=0?'+':'')+(r.vd-r.vd22).toFixed(1)})`:''}</div>
+    ${ps.map(([k,v])=>{
+      const dd=v.f!=null?v.pct-v.f:null;
+      return `<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+        <span style="font-weight:700;color:${PC&&PC[k]?PC[k]:'#999'}">${k}</span>
+        <span>${v.pct.toFixed(1)}% <span style="font-size:9px;color:var(--text-dim)">(${v.a})</span>
+        ${dd!=null?`<span style="color:${dd>=0?'#4ade80':'#f87171'};font-size:9px;margin-left:4px">${dd>=0?'+':''}${dd.toFixed(1)}</span>`:''}</span></div>`}).join('')}
+  </div>`+el.innerHTML;
+}
+function renderVn(){
+  const el=document.getElementById('vnBody');if(!el)return;
+  if(!vnData){el.innerHTML='<div style="padding:14px;text-align:center;color:var(--text-muted);font-size:12px">Inga resultat hämtade än.</div>';return}
+  const R=vnDistrikt();
+  const ks=Object.keys(R).filter(k=>R[k].tot>0);
+  let tot=0,rb=0,rb22=0,tot22=0;const P={},P22={};
+  ks.forEach(k=>{const r=R[k];tot+=r.tot;if(r.rb){rb+=r.rb}
+    for(const p in r.p){P[p]=(P[p]||0)+r.p[p].a}});
+  const g=Object.values(P).reduce((a,b)=>a+b,0);
+  const ps=Object.entries(P).sort((a,b)=>b[1]-a[1]);
+  const VL=['S','V','MP','C'],HR=['M','SD','KD','L'];
+  const vl=VL.reduce((a,p)=>a+(P[p]||0),0),hr=HR.reduce((a,p)=>a+(P[p]||0),0);
+  // valdeltagande viktat
+  let vv=0,vr=0,v22=0;
+  ks.forEach(k=>{const r=R[k];if(r.rb){vv+=r.tot;vr+=r.rb;if(r.vd22)v22+=r.vd22*r.rb}});
+  el.innerHTML=`<div style="padding:12px;background:var(--card);border:1px solid var(--card-border);border-radius:10px">
+    <div style="font-size:12px;font-weight:800;margin-bottom:2px">JÄRFÄLLA – ${ks.length} av ${vnData.antalValdistriktSomSkaRaknas} distrikt</div>
+    <div style="font-size:10px;color:var(--text-dim);margin-bottom:8px">
+      ${tot.toLocaleString('sv-SE')} röster · valdeltagande ${vr?(100*vv/vr).toFixed(1):'–'}%
+      ${vr&&v22?` (2022: ${(v22/vr).toFixed(1)}%)`:''}</div>
+    ${ps.map(([k,v])=>`<div style="margin-bottom:5px">
+      <div style="display:flex;justify-content:space-between;font-size:11px">
+        <span style="font-weight:700;color:${PC&&PC[k]?PC[k]:'#999'}">${k}</span>
+        <span><b>${(100*v/g).toFixed(1)}%</b> <span style="font-size:9px;color:var(--text-dim)">${v.toLocaleString('sv-SE')}</span></span></div>
+      <div style="height:5px;background:var(--surface);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(100*v/g*2.5,100)}%;background:${PC&&PC[k]?PC[k]:'#888'}"></div></div></div>`).join('')}
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--card-border);font-size:11px;display:flex;justify-content:space-between">
+      <span>🔴 V-block <b>${(100*vl/g).toFixed(1)}%</b></span>
+      <span>🔵 H-block <b>${(100*hr/g).toFixed(1)}%</b></span></div>
+  </div>`;
+  const sub=document.getElementById('vnSub');
+  if(sub)sub.textContent=`${ks.length}/${vnData.antalValdistriktSomSkaRaknas} distrikt · S ${P.S?(100*P.S/g).toFixed(1):'–'}%`;
+}
+
+function switchTab(i){document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('active',i===j));document.querySelectorAll('.page').forEach((pg,j)=>pg.classList.toggle('active',i===j));closePanel();setTimeout(applySearch,10);if(i===0)setTimeout(fitMap,50);if(i===5)renderFtr();if(i===6){ritaVnKarta();renderVn()}}
 let sy=0,panelScrollTop=0;
 const panelEl=document.getElementById('panel');
 const panelInner=panelEl.querySelector('.panel-inner');
